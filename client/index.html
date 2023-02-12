@@ -3,7 +3,7 @@
 
 <head>
    <link rel="shortcut icon" href="https://www.inclo.net/images/favicons/favicon-orange_alt.ico" type="image/x-icon">
-   <title>Whatsapp Template</title>
+   <title>TalkBridge</title>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -735,7 +735,6 @@
          });
       });
    </script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
    <script src="/socket.io/socket.io.js"></script>
    <script>
       var socket = io();
@@ -954,8 +953,9 @@
       })
 
       function removeFriend(id) {
+         confirm("Deleting " + id)
          if (confirm("Are you sure you want to remove your Friend? all messages will be permanently deleted!")) {
-            if (id.length > 0 && id != localStorage.getItem("id")) {
+            if (id != undefined && id != localStorage.getItem("id")) {
                socket.emit("removeFriend", localStorage.getItem("id"), id)
             }
          }
@@ -964,6 +964,7 @@
       socket.on("removeFriend succ", (id) => {
          var friendToRemove = document.getElementById("list" + id);
          friendToRemove.remove();
+         alert("Your Friend has been removed Successfully")
       })
 
       socket.on("removeFriend err", () => {

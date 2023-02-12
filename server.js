@@ -39,9 +39,9 @@ io.on("connection", (socket) => {
   socket.on("check login", (username, password) => {
     if (username != undefined && password != undefined) {
       conn.query(`SELECT * FROM users WHERE Username = '${username}' AND Password = '${password}'`, (err, res) => {
-        if (res.length > 0){
+        if (res.length > 0) {
           socket.emit("result", res);
-        }else socket.emit("errResult", "No user found")
+        } else socket.emit("errResult", "No user found")
       });
     }
   });
@@ -76,24 +76,28 @@ io.on("connection", (socket) => {
   })
 
   socket.on("sent message", (msg, reciever, sender) => {
-    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    var userInfo = usersList.get(reciever);
-    if (userInfo != undefined) {
-      io.to(userInfo.socketId).emit("message recive", msg, reciever, sender, usersList.get(sender).username, date);
-    }
-    conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
-      if (err) throw err;
+    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
+      if (res.length <= 0) return
+      var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      var userInfo = usersList.get(reciever);
+      if (userInfo != undefined) {
+        io.to(userInfo.socketId).emit("message recive", msg, reciever, sender, usersList.get(sender).username, date);
+      }
+      conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
+        if (err) throw err;
+      })
     })
   });
 
-  //check this!
   socket.on("get msgs from db", (id, lId) => {
-    conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
-      conn.query(`SELECT * FROM users WHERE ID = '${id}'`, (err, ress) => {
-        socket.emit("here msgs from db", res, ress);
+    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
+      if (res.length <= 0) return
+      conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
+        conn.query(`SELECT * FROM users WHERE ID = '${id}'`, (err, ress) => {
+          socket.emit("here msgs from db", res, ress);
+        })
       })
     })
-
   })
 
   socket.on("prepare user search", (id) => {
@@ -117,7 +121,7 @@ io.on("connection", (socket) => {
                 socket.to(usersList.get(userInfo.ID.toString()).socketId).emit("friend added you", result);
               })
             }
-          }else{
+          } else {
             socket.emit("error", errorno)
           }
         })
@@ -126,14 +130,13 @@ io.on("connection", (socket) => {
   })
 
   socket.on("removeFriend", (userid, friendId) => {
-    if (id.length == 0) return
-    conn.query(`DELETE FROM friends WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err,res) => {
-      if (res.length > 0){
-        conn.query(`DELETE FROM messages WHERE DELETE FROM friends WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err,res) => {
-          if (err) throw err
-          socket.emit("removeFriend succ", friendId)
-        })
-      }else socket.emit("removeFriend err")
+    if (friendId.length <= 0) return
+    conn.query(`DELETE FROM friends WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err, res) => {
+      if (err) throw err
+      conn.query(`DELETE FROM messages WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err, res) => {
+        if (err) throw err
+        socket.emit("removeFriend succ", friendId)
+      })
     })
   })
 
