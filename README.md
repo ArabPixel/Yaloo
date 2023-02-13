@@ -7,4 +7,4 @@ Yaloo is a Free Communication APP For Developers With Specific Feautures. The Go
 
 * Wanna help developing this application? Contact us here:
 
-- Discord : <a target="_blank" href="https://discord.gg/kegwxXK4"> ArabPixel#4066 </a>
+- Discord : <a target='_blank' href="https://discord.gg/kegwxXK4"> ArabPixel#4066 </a>
