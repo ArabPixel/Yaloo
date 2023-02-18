@@ -27,7 +27,7 @@ var usersList = new Map();
 io.on("connection", (socket) => {
   //set username and id 
   socket.on("update my socketID", (username, id) => {
-    usersList.set(id, { username: username, socketId: socket.id, status: "Online" })
+    usersList.set(Number(id), { username: username, socketId: socket.id, status: "Online" })
     conn.query(`UPDATE users SET Unique_id = '${socket.id}', Status = 'Online' WHERE ID = '${id}'`, (err, res) => {
       if (err) throw err
       sendStatus(id, "Online", socket)
@@ -75,6 +75,7 @@ io.on("connection", (socket) => {
     });
   })
 
+  //send message
   socket.on("sent message", (msg, reciever, sender) => {
     conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
       if (res.length <= 0) return
@@ -89,6 +90,7 @@ io.on("connection", (socket) => {
     })
   });
 
+  //get messages from database
   socket.on("get msgs from db", (id, lId) => {
     conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
       if (res.length <= 0) return
@@ -100,76 +102,83 @@ io.on("connection", (socket) => {
     })
   })
 
+  // get all users to be displayed in search bar to be added as friends
   socket.on("prepare user search", (id) => {
     conn.query(`SELECT * FROM users WHERE ID != '${id}'`, (err, res) => {
       socket.emit("user search", res);
     })
   })
 
+  //Add friend request
   socket.on("addFriend", (name, from_id) => {
     conn.query(`SELECT ID, Username, Status FROM users WHERE Username = '${name}'`, (err, res) => {
-      if (err || res.length == 0) { socket.emit("error", err); } else {
-        conn.query(`SELECT from_id, to_id from friends WHERE from_id = '${res[0].ID}' OR to_id = '${res[0].ID}'`, (errorno, resulty) => {
+      if (err || res.length == 0) { socket.emit("removeFriend", err); } else {
+        conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR to_id = '${from_id}' AND from_id = '${res[0].ID}'`, (errorno, resulty) => {
           if (errorno) throw errorno
           if (resulty.length == 0) {
             conn.query(`INSERT INTO friends(from_id, to_id, status)VALUES('${from_id}','${res[0].ID}','1')`, (err, ress) => {
               socket.emit("friend added successfully", res);
             })
-            if (usersList.has(res[0].ID.toString())) {
+            if (usersList.has(res[0].ID)) {
               var userInfo = res[0];
               conn.query(`SELECT ID, Username, Status FROM users WHERE ID = '${from_id}'`, (err, result) => {
-                socket.to(usersList.get(userInfo.ID.toString()).socketId).emit("friend added you", result);
+                socket.to(usersList.get(userInfo.ID).socketId).emit("friend added you", result);
               })
             }
           } else {
-            socket.emit("error", errorno)
+            socket.emit("removeFriend", errorno)
           }
         })
       }
     })
   })
 
-  socket.on("removeFriend", (userid, friendId) => {
+  // remove friend
+  socket.on("removeFriend", (userid, username, friendId) => {
     if (friendId.length <= 0) return
     conn.query(`DELETE FROM friends WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err, res) => {
       if (err) throw err
       conn.query(`DELETE FROM messages WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err, res) => {
         if (err) throw err
         socket.emit("removeFriend succ", friendId)
+        if (usersList.has(friendId)) {
+          socket.to(usersList.get(friendId).socketId).emit("friend deleted you", userid, username)
+        }
       })
     })
   })
+  //on disconnect chage status to offline
+socket.on("disconnecting", () => {
+  //convert map to array to get the key from a value and update status by storing the object inside variable user
+  let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);
+  if (usersList.get(key) == undefined) return
+  let user = usersList.get(key)
+  user.status = 'Offline'
+  usersList.set(key, user)
+  conn.query(`UPDATE users SET Status = 'Offline' WHERE ID = '${key}'`, (err, res) => {
+    if (err) throw err
 
+    sendStatus(key, "Offline", socket)
 
-  socket.on("disconnecting", () => {
-    //convert map to array to get the key from a value and update status by storing the object inside variable user
-    let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);
-    if (usersList.get(key) == undefined) return
-    let user = usersList.get(key)
-    user.status = 'Offline'
-    usersList.set(key, user)
-    conn.query(`UPDATE users SET Status = 'Offline' WHERE ID = '${key}'`, (err, res) => {
-      if (err) throw err
-
-      sendStatus(key, "Offline", socket)
-
-    })
   })
+})
+})
+
+
+
 
   //groups
 
-});
-
+// send offline/online status to friends
 function sendStatus(key, status, socket) {
   conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${key}' OR to_id = '${key}'`, (erro, ress) => {
     if (erro) throw erro
-    // send the offline user status to all friends exept him
+    // send user status to all friends exept him
     ress.forEach(element => {
-      //let id = element.from_id == key ? element.to_id : element.from_id
       let id = element.from_id == key ? element.to_id : element.from_id
       // if nobody from friends is online, don't send
-      if (usersList.get(id.toString()) == undefined) return
-      let getUserUid = usersList.get(id.toString())
+      if (usersList.get(id) == undefined) return
+      let getUserUid = usersList.get(id)
       if (getUserUid.status == "Online") {
         socket.to(getUserUid.socketId).emit("changeUserStatus", status, key)
       }
@@ -179,5 +188,5 @@ function sendStatus(key, status, socket) {
 
 
 server.listen(80, () => {
-  console.log('listening on *:3000');
+  console.log('listening on *:80');
 });

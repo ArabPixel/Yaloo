@@ -896,7 +896,9 @@
          //recieverStatus
          var usersListStatus = document.getElementById("i" + id);
          var recieverStatus = document.getElementById("recieverStatus")
+         // change status in sidebar
          usersListStatus.innerText = status;
+         // if user2 got online and user1 in in thier chat, change status to online
          if (urlParams.get("id") && urlParams.get("id") == id) {
             recieverStatus.innerText = status
          }
@@ -922,7 +924,7 @@
                '<span class="name-meta">' + res[0].Username + '</span>' +
                '</div>' +
                '<div class="col-sm-4 col-xs-4 pull-right sideBar-time">' +
-               '<span class="time-meta pull-right" onclick="removeFriend(' + id + ');"></span>' + //soon
+               '<span class="time-meta pull-right" onclick="removeFriend('+ res[0].ID +');"></span>' + //soon
                '<span class="time-meta pull-right" style="margin-top: -10px;" id="' + res[0].ID + '">' + res[0].Status + '</span>' +
                '</div>' +
                '</div>' +
@@ -944,7 +946,7 @@
             '<span class="name-meta">' + res[0].Username + '</span>' +
             '</div>' +
             '<div class="col-sm-4 col-xs-4 pull-right sideBar-time">' +
-            '<span class="time-meta pull-right" onclick="removeFriend(' + id + ');"></span>' + // soon
+            '<span class="time-meta pull-right" onclick="removeFriend('+ res[0].ID +');"></span>' + // soon
             '<span class="time-meta pull-right" style="margin-top: -10px;" id="' + res[0].ID + '">' + res[0].Status + '</span>' +
             '</div>' +
             '</div>' +
@@ -953,10 +955,9 @@
       })
 
       function removeFriend(id) {
-         confirm("Deleting " + id)
          if (confirm("Are you sure you want to remove your Friend? all messages will be permanently deleted!")) {
             if (id != undefined && id != localStorage.getItem("id")) {
-               socket.emit("removeFriend", localStorage.getItem("id"), id)
+               socket.emit("removeFriend", localStorage.getItem("id"), localStorage.getItem("username"), id)
             }
          }
       }
@@ -965,19 +966,24 @@
          var friendToRemove = document.getElementById("list" + id);
          friendToRemove.remove();
          alert("Your Friend has been removed Successfully")
+         location.href = "/"
+      })
+
+      socket.on("friend deleted you", (id, username) => {
+         var removeFromList = document.getElementById("list" + id)
+         removeFromList.remove()
+         alert(username + " deleted you as a friend!")
+         location.href = "/"
       })
 
       socket.on("removeFriend err", () => {
          alert("could not unfriend!")
       })
-
-      socket.on("error", () => {
-         alert("User not found or already a friend with him")
-      })
       const chatContainer = document.getElementById("conversation");
 
       let currentHeight = chatContainer.scrollHeight;
 
+      // Scroll when new message appears !!(Try to scroll when new incomming message)!!
       setInterval(function () {
          if (urlParams.get("id") != null && urlParams.get("id") > 0) {
             if (chatContainer.scrollHeight > currentHeight) {
