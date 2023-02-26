@@ -641,7 +641,7 @@
                      </div>
                   </div>
                   <div class="col-sm-1 col-xs-1  heading-dot  pull-right">
-                     <i class="fa fa-ellipsis-v fa-2x  pull-right" aria-hidden="true"></i>
+                     <i class="fa fa-users pull-right"></i> <!--onclick="makegroup();"-->
                   </div>
                   <div class="col-sm-2 col-xs-2 heading-compose  pull-right">
                      <i class="fa fa-comments fa-2x  pull-right" aria-hidden="true"></i>
@@ -743,6 +743,7 @@
       var usersDiv = document.getElementById("usersList");
       var userIdFromUrl = window.location.search;
       var urlParams = new URLSearchParams(userIdFromUrl);
+      var msgSentCounter = 0;
 
       // connect code
       socket.on("connect", () => {
@@ -785,7 +786,7 @@
             let status = res[0].Status;
             let username = res[0].Username;
             let noFriends = document.getElementById('noFriends');
-            if (noFriends) noFriends.innerText = "";
+            if (noFriends) noFriends.innerText = ""; //<input type="checkbox" value="' + id + '">
             usersDiv.innerHTML += '<a href="?id=' + id + '" id="list' + id + '"><div class="row sideBar-body">' +
                '<div class="col-sm-3 col-xs-3 sideBar-avatar">' +
                '<div class="avatar-icon">' +
@@ -808,12 +809,6 @@
       });
 
       if (urlParams.get("id")) {
-         var x = window.matchMedia("(max-width: 767px)");
-         if (x.matches) {
-            document.getElementById("sideL").style.display = "none";
-         } else {
-            document.getElementById("sideL").style.display = "block";
-         }
          socket.emit("get msgs from db", urlParams.get("id"), localStorage.getItem("id"));
          socket.on("here msgs from db", (res1, res2) => {
             document.getElementById("recieverName").innerText = res2[0].Username;
@@ -823,20 +818,22 @@
                   document.getElementById("conversation").innerHTML += '<div class="row message-body">' +
                      '<div class="col-sm-12 message-main-sender">' +
                      '<div class="sender">' +
-                     '<div class="message-text">' + element.msg + '</div>' +
+                     '<div class="message-text" id="msg'+element.ID+'"></div>' +
                      '<span class="message-time pull-right">' + element.date + '</span>' +
                      '</div>' +
                      '</div>' +
                      '</div>';
+                     document.getElementById("msg" + element.ID).textContent = element.msg
                } else {
                   document.getElementById("conversation").innerHTML += '<div class="row message-body">' +
                      '<div class="col-sm-12 message-main-receiver">' +
                      '<div class="receiver">' +
-                     '<div class="message-text">' + element.msg + '</div>' +
+                     '<div class="message-text" id="msg'+element.ID+'"></div>' +
                      '<span class="message-time pull-right">' + element.date + '</span>' +
                      '</div>' +
                      '</div>' +
                      '</div>';
+                     document.getElementById("msg" + element.ID).textContent = element.msg
                }
             });
          })
@@ -852,14 +849,16 @@
          if (message.trim().length > 0 && urlParams.get("id") != localStorage.getItem("id") && urlParams.get("id") != null && urlParams.get("id") > 0) {
             socket.emit("sent message", message, urlParams.get("id"), localStorage.getItem("id"));
             var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            msgSentCounter++
             document.getElementById("conversation").innerHTML += '<div class="row message-body">' +
                '<div class="col-sm-12 message-main-sender">' +
                '<div class="sender">' +
-               '<div class="message-text">' + input.value + '</div>' +
+               '<div class="message-text"  id="msg'+msgSentCounter+'"></div>' +
                '<span class="message-time pull-right">' + date + '</span>' +
                '</div>' +
                '</div>' +
                '</div>';
+            document.getElementById("msg" + msgSentCounter).textContent = message
             input.value = "";
             input.focus();
          }
@@ -870,14 +869,16 @@
          var userIdFromUrl = window.location.search;
          var urlParams = new URLSearchParams(userIdFromUrl);
          if (sender == urlParams.get("id")) {
+            msgSentCounter++
             document.getElementById("conversation").innerHTML += '<div class="row message-body">' +
                '<div class="col-sm-12 message-main-receiver">' +
                '<div class="receiver">' +
-               '<div class="message-text">' + msg + '</div>' +
+               '<div class="message-text"  id="msg'+msgSentCounter+'"></div>' +
                '<span class="message-time pull-right">' + date + '</span>' +
                '</div>' +
                '</div>' +
                '</div>';
+               document.getElementById("msg" + msgSentCounter).textContent = msg
          } else {
             alert(username + " has just sent you a message!")
          }
@@ -924,7 +925,7 @@
                '<span class="name-meta">' + res[0].Username + '</span>' +
                '</div>' +
                '<div class="col-sm-4 col-xs-4 pull-right sideBar-time">' +
-               '<span class="time-meta pull-right" onclick="removeFriend('+ res[0].ID +');"></span>' + //soon
+               '<span class="time-meta pull-right" onclick="removeFriend(' + res[0].ID + ');"></span>' + //soon
                '<span class="time-meta pull-right" style="margin-top: -10px;" id="' + res[0].ID + '">' + res[0].Status + '</span>' +
                '</div>' +
                '</div>' +
@@ -946,7 +947,7 @@
             '<span class="name-meta">' + res[0].Username + '</span>' +
             '</div>' +
             '<div class="col-sm-4 col-xs-4 pull-right sideBar-time">' +
-            '<span class="time-meta pull-right" onclick="removeFriend('+ res[0].ID +');"></span>' + // soon
+            '<span class="time-meta pull-right" onclick="removeFriend(' + res[0].ID + ');"></span>' + // soon
             '<span class="time-meta pull-right" style="margin-top: -10px;" id="' + res[0].ID + '">' + res[0].Status + '</span>' +
             '</div>' +
             '</div>' +
@@ -986,6 +987,12 @@
       // Scroll when new message appears !!(Try to scroll when new incomming message)!!
       setInterval(function () {
          if (urlParams.get("id") != null && urlParams.get("id") > 0) {
+            var x = window.matchMedia("(max-width: 767px)");
+            if (x.matches) {
+               document.getElementById("sideL").style.display = "none";
+            } else {
+               document.getElementById("sideL").style.display = "block";
+            }
             if (chatContainer.scrollHeight > currentHeight) {
                if (chatContainer.scrollTop + chatContainer.clientHeight >= currentHeight) {
                   chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -994,6 +1001,23 @@
             }
          }
       }, 700);
+
+      //Groups (Future Update)
+
+      // function makegroup(){
+      //    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      //    let selectedCheckboxes = [];
+            
+      //    checkboxes.forEach(checkbox => {
+      //          if(checkbox.checked) {
+      //             selectedCheckboxes.push(checkbox.value);
+      //          }
+      //    });  
+      //    if (selectedCheckboxes != null || selectedCheckboxes != undefined){
+      //       var groupName = prompt("Type below the group name..")
+      //       if(groupName) socket.emit("create group", selectedCheckboxes, groupName, localStorage.getItem("id"), localStorage.getItem("username"))
+      //    }
+      // }
    </script>
 </body>
 

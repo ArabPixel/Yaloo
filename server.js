@@ -1,12 +1,15 @@
 const { Console } = require('console');
+const { captureRejectionSymbol } = require('events');
 const express = require('express');
 const app = express();
 const http = require('http');
+const { stringify } = require('querystring');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const { resume } = require('./db/db');
 const conn = require('./db/db');
 const io = new Server(server);
+const port = 80;
 
 
 app.get('/login', (req, res) => {
@@ -18,21 +21,23 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  var ip = req.socket.remoteAddress;
   res.sendFile(__dirname + '/client/index.html');
 });
+
+app.get('/test', (req, res) => {
+  res.sendFile(__dirname + '/client/groups.html');
+});
+
+// var ip = req.socket.remoteAddress; get user ip (migt be used later).
 
 var usersList = new Map();
 
 io.on("connection", (socket) => {
   //set username and id 
   socket.on("update my socketID", (username, id) => {
-    usersList.set(Number(id), { username: username, socketId: socket.id, status: "Online" })
-    conn.query(`UPDATE users SET Unique_id = '${socket.id}', Status = 'Online' WHERE ID = '${id}'`, (err, res) => {
-      if (err) throw err
-      sendStatus(id, "Online", socket)
-      socket.emit("update client socketId", socket.id);
-    })
+    usersList.set(id, { username: username, socketId: socket.id, status: "Online" })
+    sendStatus(id, "Online", socket)
+    socket.emit("update client socketId", socket.id);
   })
 
   //login
@@ -66,6 +71,7 @@ io.on("connection", (socket) => {
     conn.query(`SELECT * FROM friends WHERE from_id = '${id}' OR to_id = '${id}'`, (err, res) => {
       socket.emit("update contact list", res);
     });
+    //get Groups list if exists(Future update)
   })
 
 
@@ -77,11 +83,11 @@ io.on("connection", (socket) => {
 
   //send message
   socket.on("sent message", (msg, reciever, sender) => {
-    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
+    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${reciever}' AND to_id = '${sender}' OR from_id = '${sender}' AND to_id = '${reciever}'`, (err, res) => {
       if (res.length <= 0) return
       var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      var userInfo = usersList.get(reciever);
-      if (userInfo != undefined) {
+      if (usersList.has(reciever)) {
+        var userInfo = usersList.get(reciever);
         io.to(userInfo.socketId).emit("message recive", msg, reciever, sender, usersList.get(sender).username, date);
       }
       conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
@@ -113,16 +119,16 @@ io.on("connection", (socket) => {
   socket.on("addFriend", (name, from_id) => {
     conn.query(`SELECT ID, Username, Status FROM users WHERE Username = '${name}'`, (err, res) => {
       if (err || res.length == 0) { socket.emit("removeFriend", err); } else {
-        conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR to_id = '${from_id}' AND from_id = '${res[0].ID}'`, (errorno, resulty) => {
+        conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR from_id = '${from_id}' AND to_id = '${res[0].ID}'`, (errorno, resulty) => {
           if (errorno) throw errorno
           if (resulty.length == 0) {
             conn.query(`INSERT INTO friends(from_id, to_id, status)VALUES('${from_id}','${res[0].ID}','1')`, (err, ress) => {
               socket.emit("friend added successfully", res);
             })
-            if (usersList.has(res[0].ID)) {
+            if (usersList.has(res[0].ID.toString())) {
               var userInfo = res[0];
               conn.query(`SELECT ID, Username, Status FROM users WHERE ID = '${from_id}'`, (err, result) => {
-                socket.to(usersList.get(userInfo.ID).socketId).emit("friend added you", result);
+                socket.to(usersList.get(userInfo.ID.toString()).socketId).emit("friend added you", result);
               })
             }
           } else {
@@ -148,26 +154,36 @@ io.on("connection", (socket) => {
     })
   })
   //on disconnect chage status to offline
-socket.on("disconnecting", () => {
-  //convert map to array to get the key from a value and update status by storing the object inside variable user
-  let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);
-  if (usersList.get(key) == undefined) return
-  let user = usersList.get(key)
-  user.status = 'Offline'
-  usersList.set(key, user)
-  conn.query(`UPDATE users SET Status = 'Offline' WHERE ID = '${key}'`, (err, res) => {
-    if (err) throw err
+  socket.on("disconnecting", () => {
+    //convert map to array to get the key from a value and update status by storing the object inside variable user
+    let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);
+    if (usersList.get(key) == undefined) return
+    let user = usersList.get(key)
+    user.status = 'Offline'
+    usersList.set(key, user)
+    conn.query(`UPDATE users SET Status = 'Offline' WHERE ID = '${key}'`, (err, res) => {
+      if (err) throw err
 
-    sendStatus(key, "Offline", socket)
+      sendStatus(key, "Offline", socket)
 
+    })
   })
+
+  //groups 
+  // Store group in the database then display it to all users that are in that group
+
+  // socket.on("create group", (userids, groupName, id, creator) => {
+  //   var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  //   var idsList = id;
+  //   userids.forEach(element => {
+  //      idsList += "," + element  
+  //   });
+  //   conn.query(`INSERT INTO groups(name, creator, users, date)VALUES('${groupName}', '${creator}', '${idsList}', '${date}')`, (err,res) => {
+  //     if (err) throw err
+  //     socket.emit() // display group for creator and then if others online then display for them too.
+  //   })
+  // })
 })
-})
-
-
-
-
-  //groups
 
 // send offline/online status to friends
 function sendStatus(key, status, socket) {
@@ -177,8 +193,8 @@ function sendStatus(key, status, socket) {
     ress.forEach(element => {
       let id = element.from_id == key ? element.to_id : element.from_id
       // if nobody from friends is online, don't send
-      if (usersList.get(id) == undefined) return
-      let getUserUid = usersList.get(id)
+      if (usersList.get(id.toString()) == undefined) return
+      let getUserUid = usersList.get(id.toString())
       if (getUserUid.status == "Online") {
         socket.to(getUserUid.socketId).emit("changeUserStatus", status, key)
       }
@@ -187,6 +203,6 @@ function sendStatus(key, status, socket) {
 }
 
 
-server.listen(80, () => {
-  console.log('listening on *:80');
+server.listen(port, () => {
+  console.log('listening on *:' + port);
 });
