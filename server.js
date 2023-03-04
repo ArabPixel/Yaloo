@@ -3,6 +3,7 @@ const { captureRejectionSymbol } = require('events');
 const express = require('express');
 const app = express();
 const http = require('http');
+const { send } = require('process');
 const { stringify } = require('querystring');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -11,7 +12,7 @@ const conn = require('./db/db');
 const io = new Server(server);
 const port = 80;
 
-
+// website urls
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/client/login.html');
 });
@@ -24,9 +25,17 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/client/index.html');
 });
 
-app.get('/test', (req, res) => {
-  res.sendFile(__dirname + '/client/groups.html');
+
+// css and js files
+app.get('/css/index', (req, res) => {
+  res.sendFile(__dirname + '/client/css/index.css');
 });
+
+app.get('/js/index', (req, res) => {
+  res.sendFile(__dirname + '/client/js/index.js');
+});
+
+
 
 // var ip = req.socket.remoteAddress; get user ip (migt be used later).
 
@@ -38,6 +47,7 @@ io.on("connection", (socket) => {
     usersList.set(id, { username: username, socketId: socket.id, status: "Online" })
     sendStatus(id, "Online", socket)
     socket.emit("update client socketId", socket.id);
+    console.log(usersList)
   })
 
   //login
@@ -169,6 +179,15 @@ io.on("connection", (socket) => {
     })
   })
 
+  // Send typing indicator
+  socket.on("typing", (sender, receiver, typing) => {
+    if (sender == receiver) return
+    if (typing == undefined){
+      typing = usersList.get(sender).status
+    }
+    io.to(usersList.get(receiver).socketId).emit("changeUserStatus", typing, sender)
+  })
+
   //groups 
   // Store group in the database then display it to all users that are in that group
 
@@ -196,7 +215,7 @@ function sendStatus(key, status, socket) {
       if (usersList.get(id.toString()) == undefined) return
       let getUserUid = usersList.get(id.toString())
       if (getUserUid.status == "Online") {
-        socket.to(getUserUid.socketId).emit("changeUserStatus", status, key)
+        io.to(getUserUid.socketId).emit("changeUserStatus", status, key)
       }
     });
   })
