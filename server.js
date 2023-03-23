@@ -1,5 +1,6 @@
 const { Console } = require('console');
 const { captureRejectionSymbol } = require('events');
+const { json } = require('express');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -38,16 +39,33 @@ app.get('/js/index', (req, res) => {
 
 
 // var ip = req.socket.remoteAddress; get user ip (migt be used later).
-
+var msgsCountFromDb
 var usersList = new Map();
+conn.query(`SELECT * FROM users`, (err,res) => {
+  res.forEach(user => {
+    usersList.set(user.ID.toString(), {username: user.Username, socketId: null, status: "Offline"})
+  });
+})
+
+conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
+  msgsCountFromDb = res[0]['COUNT(*)']
+  console.log(msgsCountFromDb)
+})
+
+setInterval(() => {
+  conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
+    msgsCountFromDb = res[0]['COUNT(*)']
+    console.log(msgsCountFromDb)
+  })
+}, 150000);
 
 io.on("connection", (socket) => {
   //set username and id 
   socket.on("update my socketID", (username, id) => {
     usersList.set(id, { username: username, socketId: socket.id, status: "Online" })
     sendStatus(id, "Online", socket)
+    conn.query(`UPDATE users SET status = 'Online' WHERE ID = '${id}'`,()=>{})
     socket.emit("update client socketId", socket.id);
-    console.log(usersList)
   })
 
   //login
@@ -98,7 +116,9 @@ io.on("connection", (socket) => {
       var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
       if (usersList.has(reciever)) {
         var userInfo = usersList.get(reciever);
-        io.to(userInfo.socketId).emit("message recive", msg, reciever, sender, usersList.get(sender).username, date);
+        msgsCountFromDb++
+        socket.emit("message sent", msgsCountFromDb)
+        io.to(userInfo.socketId).emit("message receive", msg, reciever, sender, usersList.get(sender).username, date, msgsCountFromDb);
       }
       conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
         if (err) throw err;
@@ -107,7 +127,7 @@ io.on("connection", (socket) => {
   });
 
   //get messages from database
-  socket.on("get msgs from db", (id, lId) => {
+  socket.on("get msgs from db", (id, lId) => { // LId = LocalStorage id
     conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
       if (res.length <= 0) return
       conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
@@ -156,6 +176,7 @@ io.on("connection", (socket) => {
       if (err) throw err
       conn.query(`DELETE FROM messages WHERE from_id = '${userid}' AND to_id = '${friendId}' OR from_id = '${friendId}' AND to_id = '${userid}'`, (err, res) => {
         if (err) throw err
+        console.log(res)
         socket.emit("removeFriend succ", friendId)
         if (usersList.has(friendId)) {
           socket.to(usersList.get(friendId).socketId).emit("friend deleted you", userid, username)
@@ -185,7 +206,9 @@ io.on("connection", (socket) => {
     if (typing == undefined){
       typing = usersList.get(sender).status
     }
-    io.to(usersList.get(receiver).socketId).emit("changeUserStatus", typing, sender)
+    if (usersList.has(receiver)){
+      io.to(usersList.get(receiver).socketId).emit("changeUserStatus", typing, sender)
+    }
   })
 
   //groups 
@@ -202,6 +225,17 @@ io.on("connection", (socket) => {
   //     socket.emit() // display group for creator and then if others online then display for them too.
   //   })
   // })
+
+  socket.on("deleteMsg", (msgId, receiver, sender) => {
+    if (!usersList.has(receiver)) return
+    if(usersList.get(sender).status != "Online") return
+    socket.emit("message deleted", msgId, usersList.get(sender).username)
+    conn.query(`UPDATE messages SET deleted = 1 WHERE ID = '${msgId}'`, (err,res) => {
+      if (err) throw err
+    })
+    if(usersList.get(receiver).status != "Online") return
+    io.to(usersList.get(receiver).socketId).emit("message deleted", msgId, usersList.get(sender).username)
+  })
 })
 
 // send offline/online status to friends
