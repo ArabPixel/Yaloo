@@ -4,12 +4,14 @@ const { json } = require('express');
 const express = require('express');
 const app = express();
 const http = require('http');
-const { send } = require('process');
+const { send, off } = require('process');
 const { stringify } = require('querystring');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const { resume } = require('./db/db');
 const conn = require('./db/db');
+const { userInfo } = require('os');
+const { url } = require('inspector');
 const io = new Server(server);
 const port = 80;
 
@@ -26,6 +28,9 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/client/index.html');
 });
 
+app.get('/settings', (req, res) => {
+  res.sendFile(__dirname + '/client/settings.html');
+});
 
 // css and js files
 app.get('/css/index', (req, res) => {
@@ -38,9 +43,14 @@ app.get('/js/index', (req, res) => {
 
 
 
-// var ip = req.socket.remoteAddress; get user ip (migt be used later).
+// var ip = req.socket.remoteAddress; get user ip (might be used later).
 var msgsCountFromDb
 var usersList = new Map();
+// Make all users offline in DB at the start of the server
+conn.query(`UPDATE users SET Status = "Offline"`, (err,res) => {
+  if (err) console.error(err)
+})
+// Import all users in a List to grab users faster
 conn.query(`SELECT * FROM users`, (err,res) => {
   res.forEach(user => {
     usersList.set(user.ID.toString(), {username: user.Username, socketId: null, status: "Offline"})
@@ -49,16 +59,18 @@ conn.query(`SELECT * FROM users`, (err,res) => {
 
 conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
   msgsCountFromDb = res[0]['COUNT(*)']
-  console.log(msgsCountFromDb)
+  console.log(res[0]['COUNT(*)'])
 })
 
 setInterval(() => {
   conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
+    if (msgsCountFromDb != res[0]['COUNT(*)']){
+      console.log(res[0]['COUNT(*)'])
+    }
     msgsCountFromDb = res[0]['COUNT(*)']
-    console.log(msgsCountFromDb)
   })
 }, 150000);
-
+// On user connection
 io.on("connection", (socket) => {
   //set username and id 
   socket.on("update my socketID", (username, id) => {
@@ -117,22 +129,28 @@ io.on("connection", (socket) => {
       if (usersList.has(reciever)) {
         var userInfo = usersList.get(reciever);
         msgsCountFromDb++
-        socket.emit("message sent", msgsCountFromDb)
-        io.to(userInfo.socketId).emit("message receive", msg, reciever, sender, usersList.get(sender).username, date, msgsCountFromDb);
+        // socket.emit("message sent", msgsCountFromDb)
+        io.to(userInfo.socketId).to(usersList.get(sender).socketId).emit("message receive", msg, reciever, sender, usersList.get(sender).username, date, msgsCountFromDb);
       }
-      conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
+      conn.query(`INSERT INTO messages(ID, from_id, to_id, msg, date)VALUES('${msgsCountFromDb}', '${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
         if (err) throw err;
       })
     })
   });
 
   //get messages from database
-  socket.on("get msgs from db", (id, lId) => { // LId = LocalStorage id
+  socket.on("get msgs from db", (id, lId, limit) => { // LId = LocalStorage id
     conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${id}' AND '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
       if (res.length <= 0) return
-      conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}'`, (err, res) => {
+      conn.query(`SELECT * FROM ( SELECT * FROM messages WHERE (from_id = '${id}' AND to_id = '${lId}') OR (from_id = '${lId}' AND to_id = '${id}') ORDER BY ID DESC LIMIT ${limit} ) subquery ORDER BY ID ASC`, (err, res) => {
         conn.query(`SELECT * FROM users WHERE ID = '${id}'`, (err, ress) => {
-          socket.emit("here msgs from db", res, ress);
+          conn.query(`SELECT ID FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}' LIMIT 1`, (errId,resId) => {
+            if (resId[0] == undefined || resId[0] == null){
+              socket.emit("here msgs from db", res, ress);
+            }else{
+              socket.emit("here msgs from db", res, ress, resId[0]['ID']);
+            }
+          })
         })
       })
     })
@@ -148,7 +166,9 @@ io.on("connection", (socket) => {
   //Add friend request
   socket.on("addFriend", (name, from_id) => {
     conn.query(`SELECT ID, Username, Status FROM users WHERE Username = '${name}'`, (err, res) => {
-      if (err || res.length == 0) { socket.emit("removeFriend", err); } else {
+      if (err || res.length == 0){ 
+        socket.emit("removeFriend", err); 
+      } else {
         conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR from_id = '${from_id}' AND to_id = '${res[0].ID}'`, (errorno, resulty) => {
           if (errorno) throw errorno
           if (resulty.length == 0) {
@@ -235,6 +255,12 @@ io.on("connection", (socket) => {
     })
     if(usersList.get(receiver).status != "Online") return
     io.to(usersList.get(receiver).socketId).emit("message deleted", msgId, usersList.get(sender).username)
+  })
+
+  socket.on("load more messages", (id, urlId, offset) => {
+    conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${urlId}' OR from_id = '${urlId}' AND to_id = '${id}' ORDER BY date DESC LIMIT 2 OFFSET ${offset}`, (err,res) => {
+      socket.emit("load more messages now", res, usersList.get(urlId).username)
+    })
   })
 })
 
