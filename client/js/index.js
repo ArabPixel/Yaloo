@@ -11,7 +11,7 @@ let timeout;                                                         //    Timeo
 let friends = [];                                                    //    Store friends
 let confirmDelete = "Are you sure you want to delete this message?"  //    Deletion confirm message
 let deletedMessage = "Deleted this Message"                          //    Text shown when a message deleted (Format: username + var deletedMessage)
-let loadedMessagesCount = 50                                          //    Messages that will load on enter the conversation
+let loadedMessagesCount = 2                                          //    Messages that will load on enter the conversation
 let loadMessageBtn = document.getElementById("loadMoreBtn")          //    Load Messages Button
 let firstMsgIdOfConversation                                         //    First Message id of current conversation
 
@@ -78,6 +78,7 @@ socket.on("here is user name", (res, id) => {
    }
 });
 
+// load msgs when joining someone's chat
 if (urlParams.get("id")) {
    socket.emit("get msgs from db", urlParams.get("id"), localStorage.getItem("id"), loadedMessagesCount);
    socket.on("here msgs from db", (res1, res2, resId) => {
@@ -123,9 +124,12 @@ if (urlParams.get("id")) {
                   document.getElementById("msg" + element.ID).textContent = element.msg
                }
          }
+         if (element.ID == resId) loadMessageBtn.remove()
       });
       chatContainer.scrollTop = chatContainer.scrollHeight
    })
+}else{
+   loadMessageBtn.remove()
 }
 
 //send message code
@@ -156,6 +160,7 @@ socket.on("message receive", (msg, reciever, sender, username, date, msgsCountFr
    }
 });
 
+// prepare user options to add them as a friend 
 socket.emit("prepare user search", localStorage.getItem("id"));
 socket.on("user search", (res) => {
    res.forEach(element => {
@@ -264,49 +269,14 @@ socket.on("load more messages now", (res, friendUsername) => {
    res.forEach(element => {
       loadedMessagesCount++;
       if (element.from_id == localStorage.getItem("id")){
-         newMessageContent = `
-           <div class="row message-body">
-             <div class="col-sm-12 message-main-sender">
-               <div class="sender" id="sender${element.ID}">
-                 <div class="message-text" id="msg${element.ID}"></div>
-                 <span class="message-time pull-right">${element.date}</span>
-               </div>
-             </div>
-           </div>
-         ` 
-
-         // Step 3: Insert the new message at the top of the chat container
-         chatContainer.insertAdjacentHTML("afterbegin", newMessageContent);
-         if(element.deleted){
-            document.getElementById("msg" + element.ID).innerHTML = `<em>You ${deletedMessage}</em>`
-         }else{
-            document.getElementById("msg" + element.ID).textContent = element.msg
-         }
+         displayLoadedMessages(element.ID, "sender", element.date, element.msg, element.deleted)
       }else{
-         newMessageContent = `
-           <div class="row message-body">
-             <div class="col-sm-12 message-main-receiver">
-               <div class="receiver" id="receiver${element.ID}">
-                 <div class="message-text" id="msg${element.ID}"></div>
-                 <span class="message-time pull-right">${element.date}</span>
-               </div>
-             </div>
-           </div>
-         ` 
-         
-         // Step 3: Insert the new message at the top of the chat container
-         chatContainer.insertAdjacentHTML("afterbegin", newMessageContent);
-         if(element.deleted){
-            document.getElementById("msg" + element.ID).innerHTML = `<em>${friendUsername} ${deletedMessage}</em>`
-         }else{
-            document.getElementById("msg" + element.ID).textContent = element.msg
-         }      
+         displayLoadedMessages(element.ID, "receiver", element.date, element.msg, element.deleted)     
       }
       if(element.ID == firstMsgIdOfConversation){
          loadMessageBtn.remove();
       }
-      console.log("First "+firstMsgIdOfConversation)
-      console.log("ELEMENT " +element.ID)
+
    });
 })
 
@@ -348,6 +318,27 @@ function displayMessage(side, msg, date, countFromDb){
    scrollToBottom()
 }
 
+function displayLoadedMessages(ID, side, date, msg, deleted){
+   newMessageContent = `
+   <div class="row message-body">
+     <div class="col-sm-12 message-main-${side}">
+       <div class="${side}" id="${side+ID}">
+         <div class="message-text" id="msg${ID}"></div>
+         <span class="message-time pull-right">${date}</span>
+       </div>
+     </div>
+   </div>
+ ` 
+
+ // Step 3: Insert the new message at the top of the chat container
+ chatContainer.insertAdjacentHTML("afterbegin", newMessageContent);
+ if(deleted){
+    document.getElementById("msg" + ID).innerHTML = `<em>You ${deletedMessage}</em>`
+ }else{
+    document.getElementById("msg" + ID).textContent = msg
+ }
+}
+
 // Auto scroll when user at the bottom of the msgs div
 function scrollToBottom() {
    const scrollThreshold = 100; // adjust this value to control how close to the bottom the user must be before auto-scrolling
@@ -375,6 +366,7 @@ function typingTimeOut(){
 
 // Check if load msgs btn is clicked
 function loadMoreRequest(){
+   if (urlParams.get("id") <= 0 || urlParams.get("id") == undefined) return
    socket.emit("load more messages", localStorage.getItem("id"), urlParams.get("id"), loadedMessagesCount)
 }
 

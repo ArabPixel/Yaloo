@@ -258,6 +258,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("load more messages", (id, urlId, offset) => {
+    if (urlId == undefined || urlId == null) return
     conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${urlId}' OR from_id = '${urlId}' AND to_id = '${id}' ORDER BY date DESC LIMIT 2 OFFSET ${offset}`, (err,res) => {
       socket.emit("load more messages now", res, usersList.get(urlId).username)
     })
