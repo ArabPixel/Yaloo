@@ -14,6 +14,7 @@ const { userInfo } = require('os');
 const { url } = require('inspector');
 const io = new Server(server);
 const port = 80;
+const settingsURL = io.of("/settings")
 
 // website urls
 app.get('/login', (req, res) => {
@@ -39,6 +40,10 @@ app.get('/css/index', (req, res) => {
 
 app.get('/js/index', (req, res) => {
   res.sendFile(__dirname + '/client/js/index.js');
+});
+
+app.get('/logo', (req, res) => {
+  res.sendFile(__dirname + '/client/images/logo.ico');
 });
 
 
@@ -264,6 +269,10 @@ io.on("connection", (socket) => {
     })
   })
 })
+
+io.of("/settings").on('connection', (socket) => {
+  
+});
 
 // send offline/online status to friends
 function sendStatus(key, status, socket) {

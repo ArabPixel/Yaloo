@@ -183,6 +183,14 @@
           </table>
     </center>
     <br>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io('/settings')
+        socket.on('connect', () => {
+            
+        });
+    </script>
+
 </body>
 
 </html>

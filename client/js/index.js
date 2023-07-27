@@ -11,10 +11,10 @@ let timeout;                                                         //    Timeo
 let friends = [];                                                    //    Store friends
 let confirmDelete = "Are you sure you want to delete this message?"  //    Deletion confirm message
 let deletedMessage = "Deleted this Message"                          //    Text shown when a message deleted (Format: username + var deletedMessage)
-let loadedMessagesCount = 2                                          //    Messages that will load on enter the conversation
+let loadedMessagesCount = 50                                         //    Messages that will load on enter the conversation
 let loadMessageBtn = document.getElementById("loadMoreBtn")          //    Load Messages Button
 let firstMsgIdOfConversation                                         //    First Message id of current conversation
-
+let notificationMaxBody = 40                                         //    This will cut and make the notification body dottet at the end
 
 // connect code
 socket.on("connect", () => {
@@ -156,7 +156,8 @@ socket.on("message receive", (msg, reciever, sender, username, date, msgsCountFr
    }else if (sender == localStorage.getItem("id")){
       displayMessage("sender", msg, date, msgsCountFromDb)
    } else {
-      alert(username + " has just sent you a message!")
+      notification("New message from " + username, msg, sender)
+      // alert(username + " has just sent you a message!")
    }
 });
 
@@ -384,6 +385,11 @@ window.addEventListener('resize', () => {
    }
 })
 
+// check notification permission when finishing loading
+onload = (e) => {
+   requestNotificationPermission()
+}
+
 // After clicking "Enter" send message
 input.addEventListener("keydown", (e) => {
    if (e.key == "Enter" && !e.shiftKey){
@@ -401,6 +407,40 @@ input.addEventListener("keyup", function (e) {
    clearTimeout(timeout)
    timeout = setTimeout(typingTimeOut, 2000)
 });
+
+window.addEventListener("online", () =>{
+   notification("You are back online!","", "")
+})
+
+window.addEventListener("offline", ()=>{
+   notification("You lost connection!", "", "")
+})
+
+function notification(title, body, tag){
+   Notification.requestPermission().then(function(permission){
+      if(permission == "granted"){
+         if(body.length > notificationMaxBody) body = body.substring(0, notificationMaxBody) + "..."
+         let notify = new Notification(title, {
+            body: body,
+            icon: window.location.origin + "/logo",
+         })
+         if(tag) notify.tag = tag
+      }else{
+         alert("You got a new message but we can't notify you about them because they are blocked.")
+      }
+   })
+}
+
+async function requestNotificationPermission(){
+   try {
+         const permission = await Notification.requestPermission();
+         if (permission === "denied") {
+            alert("Notifications are denied. Please allow notifications to receive alerts about new messages.");
+         }
+   } catch (error) {
+      console.error("Error while requesting notification permission:", error);
+   }
+}
 
 //Groups (Future Update)
 
