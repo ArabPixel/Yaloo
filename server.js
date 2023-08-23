@@ -46,30 +46,130 @@ app.get('/logo', (req, res) => {
   res.sendFile(__dirname + '/client/images/logo.ico');
 });
 
+/////////////////// Includes ///////////////////
+app.get('/includes/sharedContent', (req, res) => {
+  res.sendFile(__dirname + '/client/shared.js');
+});
+
+app.get('/includes/functions/addFriend', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/addFriend.js');
+});
+
+app.get('/includes/functions/convoScroll', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/convoScroll.js');
+});
+
+app.get('/includes/functions/deleteMsg', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/deleteMsg.js');
+});
+
+app.get('/includes/functions/displayMsg', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/displayMsg.js');
+});
+
+app.get('/includes/functions/localNotification', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/localNotification.js');
+});
+
+
+app.get('/includes/functions/removeFriend', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/removeFriend.js');
+});
+
+
+app.get('/includes/functions/requestNotificationPerm', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/requestNotificationPerm.js');
+});
+
+app.get('/includes/functions/typingIndicator', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/typingIndicator.js');
+});
+
+app.get('/includes/events/click', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/click.js');
+});
+
+app.get('/includes/events/loadMoreMsgsReq', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/LoadMoreMsgsReq.js');
+});
+
+app.get('/includes/events/keydown', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/keydown.js');
+});
+
+app.get('/includes/events/keyup', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/keyup.js');
+});
+
+app.get('/includes/events/window', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/window.js');
+});
+
+app.get('/includes/events/focus', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/focus.js');
+});
+
+app.get('/includes/events/onload', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/events/onload.js');
+});
+
+app.get('/includes/socketEvents/loadMoreMsgs', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/loadMoreMsgs.js');
+});
+
+app.get('/includes/socketEvents/connect', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/connect.js');
+});
+
+app.get('/includes/socketEvents/msgReceive', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/msgReceive.js');
+});
+
+app.get('/includes/socketEvents/statusChanger', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/statusChanger.js');
+});
+
+app.get('/includes/socketEvents/msgDeleted', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/msgDeleted.js');
+});
+
+app.get('/includes/socketEvents/removeFriend', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/removeFriend.js');
+});
+
+app.get('/includes/socketEvents/addFriends', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/addFriends.js');
+});
+
+app.get('/includes/socketEvents/contactList', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/socketEvents/contactList.js');
+});
+
+
 
 
 // var ip = req.socket.remoteAddress; get user ip (might be used later).
 var msgsCountFromDb
 var usersList = new Map();
 // Make all users offline in DB at the start of the server
-conn.query(`UPDATE users SET Status = "Offline"`, (err,res) => {
+conn.query(`UPDATE users SET Status = "Offline"`, (err, res) => {
   if (err) console.error(err)
 })
 // Import all users in a List to grab users faster
-conn.query(`SELECT * FROM users`, (err,res) => {
+conn.query(`SELECT * FROM users`, (err, res) => {
   res.forEach(user => {
-    usersList.set(user.ID.toString(), {username: user.Username, socketId: null, status: "Offline"})
+    usersList.set(user.ID.toString(), { username: user.Username, socketId: null, status: "Offline" })
   });
 })
 
-conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
+conn.query(`SELECT COUNT(*) FROM messages`, (err, res) => {
   msgsCountFromDb = res[0]['COUNT(*)']
   console.log(res[0]['COUNT(*)'])
 })
 
 setInterval(() => {
-  conn.query(`SELECT COUNT(*) FROM messages`, (err,res) => {
-    if (msgsCountFromDb != res[0]['COUNT(*)']){
+  conn.query(`SELECT COUNT(*) FROM messages`, (err, res) => {
+    if (msgsCountFromDb != res[0]['COUNT(*)']) {
       console.log(res[0]['COUNT(*)'])
     }
     msgsCountFromDb = res[0]['COUNT(*)']
@@ -81,7 +181,7 @@ io.on("connection", (socket) => {
   socket.on("update my socketID", (username, id) => {
     usersList.set(id, { username: username, socketId: socket.id, status: "Online" })
     sendStatus(id, "Online", socket)
-    conn.query(`UPDATE users SET status = 'Online' WHERE ID = '${id}'`,()=>{})
+    conn.query(`UPDATE users SET status = 'Online' WHERE ID = '${id}'`, () => { })
     socket.emit("update client socketId", socket.id);
   })
 
@@ -127,17 +227,17 @@ io.on("connection", (socket) => {
   })
 
   //send message
-  socket.on("sent message", (msg, reciever, sender) => {
-    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${reciever}' AND to_id = '${sender}' OR from_id = '${sender}' AND to_id = '${reciever}'`, (err, res) => {
+  socket.on("sent message", (msg, receiver, sender) => {
+    conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${receiver}' AND to_id = '${sender}' OR from_id = '${sender}' AND to_id = '${receiver}'`, (err, res) => {
       if (res.length <= 0) return
       var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      if (usersList.has(reciever)) {
-        var userInfo = usersList.get(reciever);
+      if (usersList.has(receiver)) {
+        var userInfo = usersList.get(receiver);
         msgsCountFromDb++
         // socket.emit("message sent", msgsCountFromDb)
-        io.to(userInfo.socketId).to(usersList.get(sender).socketId).emit("message receive", msg, reciever, sender, usersList.get(sender).username, date, msgsCountFromDb);
+        io.to(userInfo.socketId).to(usersList.get(sender).socketId).emit("message receive", msg, receiver, sender, usersList.get(sender).username, date, msgsCountFromDb);
       }
-      conn.query(`INSERT INTO messages(ID, from_id, to_id, msg, date)VALUES('${msgsCountFromDb}', '${sender}', '${reciever}', '${msg}', '${date}')`, (err, res) => {
+      conn.query(`INSERT INTO messages(ID, from_id, to_id, msg, date)VALUES('${msgsCountFromDb}', '${sender}', '${receiver}', '${msg}', '${date}')`, (err, res) => {
         if (err) throw err;
       })
     })
@@ -149,10 +249,10 @@ io.on("connection", (socket) => {
       if (res.length <= 0) return
       conn.query(`SELECT * FROM ( SELECT * FROM messages WHERE (from_id = '${id}' AND to_id = '${lId}') OR (from_id = '${lId}' AND to_id = '${id}') ORDER BY ID DESC LIMIT ${limit} ) subquery ORDER BY ID ASC`, (err, res) => {
         conn.query(`SELECT * FROM users WHERE ID = '${id}'`, (err, ress) => {
-          conn.query(`SELECT ID FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}' LIMIT 1`, (errId,resId) => {
-            if (resId[0] == undefined || resId[0] == null){
+          conn.query(`SELECT ID FROM messages WHERE from_id = '${id}' AND to_id = '${lId}' OR from_id = '${lId}' AND to_id = '${id}' LIMIT 1`, (errId, resId) => {
+            if (resId[0] == undefined || resId[0] == null) {
               socket.emit("here msgs from db", res, ress);
-            }else{
+            } else {
               socket.emit("here msgs from db", res, ress, resId[0]['ID']);
             }
           })
@@ -171,26 +271,21 @@ io.on("connection", (socket) => {
   //Add friend request
   socket.on("addFriend", (name, from_id) => {
     conn.query(`SELECT ID, Username, Status FROM users WHERE Username = '${name}'`, (err, res) => {
-      if (err || res.length == 0){ 
-        socket.emit("removeFriend", err); 
-      } else {
-        conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR from_id = '${from_id}' AND to_id = '${res[0].ID}'`, (errorno, resulty) => {
-          if (errorno) throw errorno
-          if (resulty.length == 0) {
-            conn.query(`INSERT INTO friends(from_id, to_id, status)VALUES('${from_id}','${res[0].ID}','1')`, (err, ress) => {
-              socket.emit("friend added successfully", res);
+      if (err || res.length == 0) return
+      conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${res[0].ID}' AND to_id = '${from_id}' OR from_id = '${from_id}' AND to_id = '${res[0].ID}'`, (errorno, resulty) => {
+        if (errorno) throw errorno
+        if (resulty.length == 0) {
+          conn.query(`INSERT INTO friends(from_id, to_id, status)VALUES('${from_id}','${res[0].ID}','1')`, (err, ress) => {
+            socket.emit("friend added successfully", res);
+          })
+          if (usersList.has(res[0].ID.toString())) {
+            var userInfo = res[0];
+            conn.query(`SELECT ID, Username, Status FROM users WHERE ID = '${from_id}'`, (err, result) => {
+              socket.to(usersList.get(userInfo.ID.toString()).socketId).emit("friend added you", result);
             })
-            if (usersList.has(res[0].ID.toString())) {
-              var userInfo = res[0];
-              conn.query(`SELECT ID, Username, Status FROM users WHERE ID = '${from_id}'`, (err, result) => {
-                socket.to(usersList.get(userInfo.ID.toString()).socketId).emit("friend added you", result);
-              })
-            }
-          } else {
-            socket.emit("removeFriend", errorno)
           }
-        })
-      }
+        }
+      })
     })
   })
 
@@ -228,10 +323,10 @@ io.on("connection", (socket) => {
   // Send typing indicator
   socket.on("typing", (sender, receiver, typing) => {
     if (sender == receiver) return
-    if (typing == undefined){
+    if (typing == undefined) {
       typing = usersList.get(sender).status
     }
-    if (usersList.has(receiver)){
+    if (usersList.has(receiver)) {
       io.to(usersList.get(receiver).socketId).emit("changeUserStatus", typing, sender)
     }
   })
@@ -253,25 +348,25 @@ io.on("connection", (socket) => {
 
   socket.on("deleteMsg", (msgId, receiver, sender) => {
     if (!usersList.has(receiver)) return
-    if(usersList.get(sender).status != "Online") return
+    if (usersList.get(sender).status != "Online") return
     socket.emit("message deleted", msgId, usersList.get(sender).username)
-    conn.query(`UPDATE messages SET deleted = 1 WHERE ID = '${msgId}'`, (err,res) => {
+    conn.query(`UPDATE messages SET deleted = 1 WHERE ID = '${msgId}'`, (err, res) => {
       if (err) throw err
     })
-    if(usersList.get(receiver).status != "Online") return
+    if (usersList.get(receiver).status != "Online") return
     io.to(usersList.get(receiver).socketId).emit("message deleted", msgId, usersList.get(sender).username)
   })
 
   socket.on("load more messages", (id, urlId, offset) => {
     if (urlId == undefined || urlId == null) return
-    conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${urlId}' OR from_id = '${urlId}' AND to_id = '${id}' ORDER BY date DESC LIMIT 2 OFFSET ${offset}`, (err,res) => {
+    conn.query(`SELECT * FROM messages WHERE from_id = '${id}' AND to_id = '${urlId}' OR from_id = '${urlId}' AND to_id = '${id}' ORDER BY date DESC LIMIT 2 OFFSET ${offset}`, (err, res) => {
       socket.emit("load more messages now", res, usersList.get(urlId).username)
     })
   })
 })
 
 io.of("/settings").on('connection', (socket) => {
-  
+
 });
 
 // send offline/online status to friends

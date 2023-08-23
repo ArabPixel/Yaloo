@@ -21,6 +21,7 @@
             <div class="side-one">
                <!-- Heading -->
                <div class="row heading">
+                  <button id="langBtn">EN</button>
                   <div class="col-sm-3 col-xs-3 heading-avatar">
                      <div class="heading-avatar-icon">
                         <img src="https://wallpapers.com/images/hd/cool-neon-blue-profile-picture-u9y9ydo971k9mdcf.jpg">
@@ -38,10 +39,10 @@
                <div class="row searchBox">
                   <div class="col-sm-12 searchBox-inner">
                      <div class="form-group has-feedback">
-                        <input id="searchText" type="text" class="form-control" name="searchText"
+                        <input id="friendName" type="text" class="form-control" name="searchText"
                            placeholder="Add Friends.." list="dataList">
                         <datalist id="dataList"></datalist>
-                        <span class="glyphicon glyphicon-search form-control-feedback" onclick="addFriend();"
+                        <span class="glyphicon glyphicon-search form-control-feedback" id="addFriend"
                            style="cursor: pointer;pointer-events: all;"></span>
                      </div>
                   </div>
@@ -66,21 +67,21 @@
                   </div>
                </div>
                <div class="col-sm-8 col-xs-7 heading-name">
-                  <a class="heading-name-meta" id="recieverName"></a>
-                  <span class="heading-online" id="recieverStatus"></span>
+                  <a class="heading-name-meta" id="receiverName"></a>
+                  <span class="heading-online" id="receiverStatus"></span>
                </div>
                <div class="col-sm-1 col-xs-1  heading-dot pull-right">
-                  <i class="fa fa-ellipsis-v fa-2x  pull-right" aria-hidden="true"></i>
+                  <i class="fa fa-times pull-right" id="deleteFriendBtn" aria-hidden="true"></i>
                </div>
             </div>
             <!-- Heading End -->
             <!-- Message Box -->
-            <button id="loadMoreBtn" onclick="loadMoreRequest()">Load More Messages</button>
+            <button id="loadMoreBtn">Load More Messages</button>
 
             <div class="row message" id="conversation">
                <div class="row message-previous" id="message-previous">
-                     <div class="col-sm-12 previous">
-                     </div>
+                  <div class="col-sm-12 previous">
+                  </div>
                </div>
             </div>
             <!-- Message Box End -->
@@ -121,7 +122,7 @@
       });
    </script>
    <script src="/socket.io/socket.io.js"></script>
-   <script src="/js/index"></script>
+   <script type="module" src="/js/index"></script>
 </body>
 
 </html>

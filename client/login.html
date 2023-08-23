@@ -47,11 +47,11 @@
         });
 
         socket.on("result", (res, socketId) => {
-            console.log(res);
             if (res[0] != undefined) {
                 localStorage.setItem("uid", socketId);
                 localStorage.setItem("id", res[0].ID)
                 localStorage.setItem("username", res[0].Username)
+                localStorage.setItem("language", "en")
                 location.href = "/";
             } else {
                 alert("Information are wrong")
