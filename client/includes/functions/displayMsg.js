@@ -5,18 +5,14 @@ import { scrollToBottom } from '/includes/functions/convoScroll';
 
 // Display message function when sending/receiving/ chat
 export function displayMessage(side, msg, date, countFromDb) {
-    chatContainer.innerHTML += '<div class="row message-body">' +
-        '<div class="col-sm-12 message-main-' + side + '">' +
-        '<div class="' + side + '">' +
-        '<div class="message-text"  id="msg' + countFromDb + '"></div>' +
-        '<span class="message-time pull-right">' + date + '</span>';
-    if (side == "sender") {
-        chatContainer.innerHTML += '<button style="float: right;" type="button" onclick="Delete(' + countFromDb + ')">Delete</button>';
-    }
-    chatContainer.innerHTML +=
-        '</div>' +
-        '</div>' +
-        '</div>';
+    var tempHolder = `<div class="row message-body">
+        <div class="col-sm-12 message-main-${side}">
+        <div class="${side}">
+        <div class="message-text"  id="msg${countFromDb}"></div>
+        <span class="message-time pull-right">${date}</span>`
+    if (side == "sender") tempHolder += '<button style="float: right;" type="button" id="'+countFromDb+'" onclick="triggerDelMsg('+countFromDb+')">Delete</button>';
+    tempHolder += '</div></div></div>'
+    chatContainer.innerHTML += tempHolder
     let msgElement = document.getElementById("msg" + countFromDb)
     if (msgElement) {
         msgElement.textContent = msg

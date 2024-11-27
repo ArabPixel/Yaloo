@@ -15,6 +15,7 @@ import '/includes/socketEvents/msgDeleted'
 import '/includes/socketEvents/removeFriend'
 import '/includes/socketEvents/addFriends'
 import '/includes/socketEvents/contactList'
+import { displayMessage } from '../includes/functions/displayMsg'
 
 
 // load msgs when joining someone's chat
@@ -37,42 +38,9 @@ if (urlParams.get("id")) {
 
       res1.forEach(element => {
          if (element.from_id == localStorage.getItem("id")) {
-            chatContainer.innerHTML += '<div class="row message-body">' +
-               '<div class="col-sm-12 message-main-sender">' +
-               '<div class="sender" id="sender'+element.ID+'">' +
-               '<div class="message-text" id="msg'+element.ID+'"></div>' +
-               '<span class="message-time pull-right">' + element.date + '</span>';
-               if (element.deleted == false){
-                  let senderMsg = document.getElementById("sender" + element.ID)
-                  if (senderMsg) senderMsg.innerHTML += '<button style="float: right;" type="button" class="delete-button" id="delbtn delbtn'+element.ID+'">Delete</button>'
-               }
-               chatContainer.innerHTML +=
-               '</div>' +
-               '</div>' +
-               '</div>';
-               if (element.deleted){
-                  let msgElement = document.getElementById("msg" + element.ID)
-                  if (msgElement) msgElement.innerHTML = "<em>" + "You " + deletedMessage + "</em>"
-               }else{
-                  let msgElement = document.getElementById("msg" + element.ID)
-                  if (msgElement) msgElement.textContent = element.msg
-               }
+            displayMessage("sender", element.msg, element.date, element.ID)
          } else {
-            chatContainer.innerHTML += '<div class="row message-body">' +
-               '<div class="col-sm-12 message-main-receiver">' +
-               '<div class="receiver">' +
-               '<div class="message-text" id="msg'+element.ID+'"></div>' +
-               '<span class="message-time pull-right">' + element.date + '</span>' +
-               '</div>' +
-               '</div>' +
-               '</div>';
-               if (element.deleted){
-                  let msgElement = document.getElementById("msg" + element.ID)
-                  if (msgElement) msgElement.innerHTML = "<em>" + res2[0].Username + " " + deletedMessage + "</em>"
-               }else{
-                  let msgElement = document.getElementById("msg" + element.ID)
-                  if (msgElement) msgElement.textContent = element.msg
-               }
+            displayMessage("receiver", element.msg, element.date, element.ID)
          }
          if (element.ID == resId) loadMessageBtn.remove()
       });
