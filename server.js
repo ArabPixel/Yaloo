@@ -352,6 +352,7 @@ io.on("connection", (socket) => {
     socket.emit("message deleted", msgId, usersList.get(sender).username)
     conn.query(`UPDATE messages SET deleted = 1 WHERE ID = '${msgId}'`, (err, res) => {
       if (err) throw err
+      console.log(res)
     })
     if (usersList.get(receiver).status != "Online") return
     io.to(usersList.get(receiver).socketId).emit("message deleted", msgId, usersList.get(sender).username)

@@ -38,9 +38,9 @@ if (urlParams.get("id")) {
 
       res1.forEach(element => {
          if (element.from_id == localStorage.getItem("id")) {
-            displayMessage("sender", element.msg, element.date, element.ID)
+            displayMessage("sender", element.msg, element.date, element.ID, element.deleted)
          } else {
-            displayMessage("receiver", element.msg, element.date, element.ID)
+            displayMessage("receiver", element.msg, element.date, element.ID, element.deleted)
          }
          if (element.ID == resId) loadMessageBtn.remove()
       });
