@@ -12,11 +12,11 @@ export function displayMessage(side, msg, date, countFromDb, deleted) {
         <div class="${side}">
         <div class="message-text"  id="msg${countFromDb}"></div>
         <span class="message-time pull-right">${date}</span>`
-    if (side == "sender" && !deleted) tempHolder += `<button style="float: right;" type="button" id="delbtn${countFromDb}">Delete</button>`;
+    if (side == "sender" && deleted != false) tempHolder += `<button style="float: right;" type="button" id="delbtn${countFromDb}">Delete</button>`;
     tempHolder += '</div></div></div>'
     chatContainer.innerHTML += tempHolder
     let msgElement = document.getElementById("msg" + countFromDb)
-    if (msgElement && !deleted) {
+    if (msgElement && deleted != false) {
         msgElement.textContent = msg
     }else{
         if (side == "sender") {

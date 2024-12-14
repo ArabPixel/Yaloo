@@ -228,6 +228,7 @@ io.on("connection", (socket) => {
 
   //send message
   socket.on("sent message", (msg, receiver, sender) => {
+    // Check for login
     conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = '${receiver}' AND to_id = '${sender}' OR from_id = '${sender}' AND to_id = '${receiver}'`, (err, res) => {
       if (res.length <= 0) return
       var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -237,8 +238,11 @@ io.on("connection", (socket) => {
         // socket.emit("message sent", msgsCountFromDb)
         io.to(userInfo.socketId).to(usersList.get(sender).socketId).emit("message receive", msg, receiver, sender, usersList.get(sender).username, date, msgsCountFromDb);
       }
-      conn.query(`INSERT INTO messages(ID, from_id, to_id, msg, date)VALUES('${msgsCountFromDb}', '${sender}', '${receiver}', '${msg}', '${date}')`, (err, res) => {
+      conn.query(`INSERT INTO messages(from_id, to_id, msg, date)VALUES('${sender}', '${receiver}', '${msg}', '${date}')`, (err, res) => {
         if (err) throw err;
+        console.log(res)
+        msgsCountFromDb = res.insertId
+        console.log(msgsCountFromDb)
       })
     })
   });
@@ -304,7 +308,7 @@ io.on("connection", (socket) => {
       })
     })
   })
-  //on disconnect chage status to offline
+  //on disconnect change status to offline
   socket.on("disconnecting", () => {
     //convert map to array to get the key from a value and update status by storing the object inside variable user
     let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);

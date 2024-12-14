@@ -12,7 +12,7 @@ var userIdFromUrl = window.location.search;                          //    Get U
 var urlParams = new URLSearchParams(userIdFromUrl);                  //    Store URL Parameters
 let timeout;                                                         //    Timeout for Typing indicator
 let confirmDelete = "Are you sure you want to delete this message?"  //    Deletion confirm message
-let deletedMessage = "Deleted this Message"                          //    Text shown when a message deleted (Format: username + var deletedMessage)
+let deletedMessage = "deleted this Message"                          //    Text shown when a message deleted (Format: username + var deletedMessage)
 let loadedMessagesCount = 50                                         //    Messages that will load on enter the conversation
 let firstMsgIdOfConversation                                         //    First Message id of current conversation
 let notificationMaxBody = 40                                         //    This will cut and make the notification body dotted at the end
