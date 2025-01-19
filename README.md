@@ -1,10 +1,50 @@
 # Yaloo
-*Yaloo is in Developing... Period.* WEBSITE & MOBILE APP
+Yaloo is a free and open source communication app aimed to provide **feature-rich** experience while having a **robust privacy**.
 
-Yaloo is a Free Communication APP For Developers With Specific Feautures. The Goal Of This App is Make a Great and Fantastic Communication Place For Developers.
+***
 
-* The Application is still in Alpha version, so expect errors and bugs everywhere.
+## Goal
 
-* Wanna help developing this application? Contact us here:
+My Goal is to make a safe and open source communication app that everybody can use, and having great customization to personalize your experiece!
 
-- Discord : <a target='_blank' href="https://discord.gg/kegwxXK4"> ArabPixel#4066 </a>
+
+## Test locally or contribute
+
+*Contributions are always welcome!*
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ArabPixel/Yaloo.git
+cd Yaloo
+```
+### 2. Install the dependencies
+```bash
+npm Install
+```
+* Make changes if necessarily.
+### 3. Run the server using the Terminal
+```bash
+npm run dev
+```
+### 4. Open a pull requrest
+###  Click ->[Here](https://github.com/ArabPixel/Yaloo/pulls)
+
+## Tech Stack
+
+**Client:** 
++ HTML, CSS, Javascript, TailwindCSS
+
+**Server:** 
++ Node, Express, MySQL, Socket.io
+
+
+## Made with love by
+
+- [@ArabPixel](https://www.github.com/ArabPixel)
+
+
+## Support
+
+For support and more, join the community Discord server [Sourceware Lab](https://discord.gg/X69MUr2DKm).
+
