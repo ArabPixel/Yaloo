@@ -7,32 +7,33 @@ import { DeleteMsg } from '/includes/functions/deleteMsg';
 
 // Display message function when sending/receiving/ chat
 export function displayMessage(side, msg, date, countFromDb, deleted) {
-    var tempHolder = `<div class="row message-body">
-        <div class="col-sm-12 message-main-${side}">
-        <div class="${side}">
-        <div class="message-text"  id="msg${countFromDb}"></div>
-        <span class="message-time pull-right">${date}</span>`
-    if (side == "sender" && !deleted) tempHolder += `<button style="float: right;" type="button" id="delbtn${countFromDb}">Delete</button>`;
-    tempHolder += '</div></div></div>'
-    chatContainer.innerHTML += tempHolder
-    let msgElement = document.getElementById("msg" + countFromDb)
-    if (msgElement && !deleted) {
-        msgElement.textContent = msg
-    }else{
+
+    var newMessage = document.createElement("div");
+    newMessage.classList.add("message", side);
+    newMessage.id = "msg" + countFromDb;
+    newMessage.innerHTML = "<p></p>"
+    newMessage.querySelector("p").textContent = msg;
+    if (side == "sender" && !deleted){
+        newMessage.innerHTML += `<button style="float: right;" type="button" id="delbtn${countFromDb}">Delete</button>`;
+    }
+    if (newMessage && !deleted) {
+        newMessage.querySelector("p").textContent = msg
+        chatContainer.innerHTML += newMessage.outerHTML
+    } else {
         if (side == "sender") {
-            msgElement.innerHTML = `<em>You ${deletedMessage}</em>`
+            newMessage.innerHTML = `<em>You ${deletedMessage}</em>`
         } else {
-            msgElement.innerHTML = `<em>The sender ${deletedMessage}</em>`
+            newMessage.innerHTML = `<em>The sender ${deletedMessage}</em>`
         }
     }
 
     // Add event listener to delete button if it exists
-    if (side == "sender") {
-        const deleteButton = document.getElementById("delbtn" + countFromDb);
-        if (deleteButton) {
-            deleteButton.addEventListener('click', () => DeleteMsg(countFromDb));
-        }
-    }
+    //if (side == "sender") {
+      //  const deleteButton = document.getElementById("delbtn" + countFromDb);
+        //if (deleteButton) {
+          //  deleteButton.addEventListener('click', () => DeleteMsg(countFromDb));
+        //}
+    //}
 
     scrollToBottom()
 }
@@ -47,6 +48,7 @@ export function displayLoadedMessages(ID, side, date, msg, deleted) {
         </div>
       </div>
     </div>
+
   `
 
     // Step 3: Insert the new message at the top of the chat container

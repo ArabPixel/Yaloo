@@ -1,4 +1,5 @@
 // @ts-ignore
+/*
 import { socket, friendInput } from '/includes/sharedContent'
 friendInput?.addEventListener('focusin', () => {
     // prepare user options to add them as a friend 
@@ -10,3 +11,4 @@ friendInput?.addEventListener('focusin', () => {
         });
     })
 })
+*/

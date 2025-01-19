@@ -8,9 +8,9 @@ import { notification } from '/includes/functions/localNotification'
 socket.on("message receive", (msg, receiver, sender, username, date, msgsCountFromDb) => {
 
     if (sender == getUrlData("id")) {
-        displayMessage("receiver", msg, date, msgsCountFromDb)
+        displayMessage("received", msg, date, msgsCountFromDb)
     } else if (sender == localStorage.getItem("id")) {
-        displayMessage("sender", msg, date, msgsCountFromDb)
+        displayMessage("sent", msg, date, msgsCountFromDb)
     } else {
         notification("New message from " + username, msg, sender)
     }

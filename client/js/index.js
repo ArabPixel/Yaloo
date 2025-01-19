@@ -1,6 +1,6 @@
 // @ts-ignore
 import { socket, chatContainer, urlParams, deletedMessage, loadedMessagesCount, loadMessageBtn, updateFirstMsgIdVar, getUrlData } from '/includes/sharedContent'
-import '/includes/events/loadMoreMsgsReq'
+// import '/includes/events/loadMoreMsgsReq'
 import '/includes/events/keyup'
 import '/includes/events/keydown'
 import '/includes/events/onload'
@@ -38,31 +38,18 @@ if (urlParams.get("id")) {
 
       res1.forEach(element => {
          if (element.from_id == localStorage.getItem("id")) {
-            displayMessage("sender", element.msg, element.date, element.ID, element.deleted)
+            displayMessage("sent", element.msg, element.date, element.ID, element.deleted)
          } else {
-            displayMessage("receiver", element.msg, element.date, element.ID, element.deleted)
+            displayMessage("received", element.msg, element.date, element.ID, element.deleted)
          }
          if (element.ID == resId) loadMessageBtn.remove()
       });
       chatContainer.scrollTop = chatContainer.scrollHeight
+      loadMessageBtn.remove()
+      document.getElementById("chatLoading").remove();
    })
 }else{
    loadMessageBtn.remove()
+   document.getElementById("chatLoading").remove();
+   document.getElementById("conversation").innerHTML = "<center style='margin-top: 20px;color: black;' id='noFriends'>Go ahead and add some friends!</center>";
 }
-
-//Groups (Future Update)
-
-// function makegroup(){
-//    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-//    let selectedCheckboxes = [];
-      
-//    checkboxes.forEach(checkbox => {
-//          if(checkbox.checked) {
-//             selectedCheckboxes.push(checkbox.value);
-//          }
-//    });  
-//    if (selectedCheckboxes != null || selectedCheckboxes != undefined){
-//       var groupName = prompt("Type below the group name..")
-//       if(groupName) socket.emit("create group", selectedCheckboxes, groupName, localStorage.getItem("id"), localStorage.getItem("username"))
-//    }
-// }

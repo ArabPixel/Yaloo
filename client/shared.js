@@ -3,6 +3,7 @@ var socket = io();
 var sendBtn = document.getElementById("send");                       //    Send Button
 let loadMessageBtn = document.getElementById("loadMoreBtn")          //    Load Messages Button
 let addFriendBtn = document.getElementById("addFriend")              //    Add friend Button
+var deleteFriendBtn = document.getElementById("deleteFriendBtn")     //    Delete friend Button
 var input = document.getElementById("input");                        //    Message Input
 var usersDiv = document.getElementById("usersList");                 //    Users List (Left Side of page)    
 const chatContainer = document.getElementById("conversation");       //    Conversation div
@@ -21,6 +22,7 @@ export {
     socket,
     sendBtn,
     addFriendBtn,
+    deleteFriendBtn,
     input,
     usersDiv,
     chatContainer,

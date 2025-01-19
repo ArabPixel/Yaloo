@@ -1,24 +1,20 @@
-const { Console } = require('console');
-const { captureRejectionSymbol } = require('events');
-const { json } = require('express');
 const express = require('express');
 const app = express();
 const http = require('http');
-const { send, off } = require('process');
-const { stringify } = require('querystring');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const { resume } = require('./db/db');
 const conn = require('./db/db');
-const { userInfo } = require('os');
-const { url } = require('inspector');
 const io = new Server(server);
-const port = 80;
+const port = 8080;
 const settingsURL = io.of("/settings")
 
 // website urls
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/client/login.html');
+});
+
+app.get('/index-old', (req, res) => {
+  res.sendFile(__dirname + '/client/index-old.html');
 });
 
 app.get('/register', (req, res) => {
@@ -36,6 +32,14 @@ app.get('/settings', (req, res) => {
 // css and js files
 app.get('/css/index', (req, res) => {
   res.sendFile(__dirname + '/client/css/index.css');
+});
+
+app.get('/css/app', (req, res) => {
+  res.sendFile(__dirname + '/client/css/app.css');
+});
+
+app.get('/css/app-light', (req, res) => {
+  res.sendFile(__dirname + '/client/css/app-light.css');
 });
 
 app.get('/js/index', (req, res) => {
@@ -79,6 +83,10 @@ app.get('/includes/functions/removeFriend', (req, res) => {
 
 app.get('/includes/functions/requestNotificationPerm', (req, res) => {
   res.sendFile(__dirname + '/client/includes/functions/requestNotificationPerm.js');
+});
+
+app.get('/includes/functions/changeLang', (req, res) => {
+  res.sendFile(__dirname + '/client/includes/functions/changeLang.js');
 });
 
 app.get('/includes/functions/typingIndicator', (req, res) => {

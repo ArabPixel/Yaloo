@@ -1,0 +1,12 @@
+:root {
+    --background: #f4f3f8;
+    --dark-background: #5468ca;
+    --secondary-background: #cbd3fa;
+    --lighter-secondary-background: #e6e7fc;
+    --buttons: #F25C05;
+    --alerts: #D72638;
+    --highlight: #20B2AA;
+    --white: #FFFFFF;
+    --inactive: #b0b0b0;
+    --active: #11c53e;
+}

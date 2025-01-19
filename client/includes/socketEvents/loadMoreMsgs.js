@@ -6,9 +6,9 @@ socket.on("load more messages now", (res, friendUsername) => {
     res.forEach(element => {
         loadedMessagesCountPlus()
         if (element.from_id == localStorage.getItem("id")) {
-            displayLoadedMessages(element.ID, "sender", element.date, element.msg, element.deleted)
+            displayLoadedMessages(element.ID, "sent", element.date, element.msg, element.deleted)
         } else {
-            displayLoadedMessages(element.ID, "receiver", element.date, element.msg, element.deleted)
+            displayLoadedMessages(element.ID, "received", element.date, element.msg, element.deleted)
         }
         if (element.ID == firstMsgIdOfConversation) {
             loadMessageBtn.remove();

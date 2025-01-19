@@ -1,14 +1,12 @@
 // @ts-ignore
-import { socket, sendBtn, input, getUrlData, addFriendBtn, langBtn } from '/includes/sharedContent';
+import { socket, sendBtn, input, getUrlData, friendInput, addFriendBtn, deleteFriendBtn, langBtn } from '/includes/sharedContent';
 // @ts-ignore
 import { addFriend } from '/includes/functions/addFriend';
 // @ts-ignore
 import { typingTimeOut } from '/includes/functions/typingIndicator'
-
+import { switchLang } from '/includes/functions/changeLang';
 // @ts-ignore
 import { removeFriend } from '/includes/functions/removeFriend'
-
-const deleteFriendBtn = document.getElementById("deleteFriendBtn")
 
 //send message code
 sendBtn.addEventListener("click", () => {
@@ -23,32 +21,25 @@ sendBtn.addEventListener("click", () => {
    }
 });
 
-addFriendBtn.addEventListener("click", () => {
-   let friendName = document.getElementById("friendName")
-   if (friendName == null) return
-   // @ts-ignore
-   if (friendName.value == null && friendName.value <= 3) return
-   addFriend(friendName)
-})
-
-langBtn.addEventListener('click', () => {
-   //    if (langBtn.value == "ar"){ 
-   //       langBtn.value = 2
-   //    }
-   switch (langBtn.innerHTML) {
-
-      case "AR": {
-         langBtn.innerHTML = "EN"
-         break
-      }
-      case "EN": {
-         langBtn.innerHTML = "AR"
-         break
-      }
+document.addEventListener("click", (e) => {
+   if(e.target.classList.contains("user")){
+      location.href = "?id=" + e.target.id
    }
-})
+   console.log(e.target.parentNode)
+});
+
+ addFriendBtn.addEventListener("click", () => {
+    if (friendInput == null) return
+    // @ts-ignore
+    if (friendInput.value == null && friendInput.value <= 3) return
+    addFriend(friendInput)
+ })
 
 deleteFriendBtn?.addEventListener('click', () => {
    if(getUrlData("id") == null && getUrlData("id") == undefined) return
    removeFriend(getUrlData("id"))
+})
+
+langBtn?.addEventListener('click', (e) => {
+   switchLang()
 })

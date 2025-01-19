@@ -1,0 +1,11 @@
+:root {
+    --background: #0A1128;
+    --secondary-background: #7e84a1;
+    --lighter-secondary-background: #36363b;
+    --buttons: #F25C05;
+    --alerts: #D72638;
+    --highlight: #20B2AA;
+    --white: #FFFFFF;
+    --inactive: #b0b0b0;
+    --active: #11c53e;
+}
