@@ -4,6 +4,7 @@ html {
     font-family: Arial, sans-serif;
     line-height: 1.5;
     direction: var(--direction);
+    transition: 0.5s all;
 }
 
 body {

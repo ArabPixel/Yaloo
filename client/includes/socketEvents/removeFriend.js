@@ -1,12 +1,12 @@
 // @ts-ignore
-import { socket } from '/includes/sharedContent'
+import { socket, friendRemoved, friendRemovedYou } from '/includes/sharedContent'
 
 // Remove friend from list after you deleted him from db
 socket.on("removeFriend succ", (id) => {
     var friendToRemove = document.getElementById(id);
     if (friendToRemove) {
         friendToRemove.remove();
-        alert("Your Friend has been removed Successfully")
+        alert(friendRemoved)
         location.href = "/"
     }
 })
@@ -17,7 +17,7 @@ socket.on("friend deleted you", (id, username) => {
     var removeFromList = document.getElementById(id)
     if (removeFromList) {
         removeFromList.remove()
-        alert(username + " deleted you as a friend!")
+        alert(username + " " + friendRemovedYou)
         location.href = "/"
     }
 })

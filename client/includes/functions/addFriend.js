@@ -26,13 +26,13 @@ export function displayFriend(res) {
         <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
 
             <div class="mt-1 flex items-center gap-x-1.5">
-                <div class="flex-none rounded-full ${res[0].Status == "Online" ? "bg-emerald-500/20" : ""} p-1">
-                <div class="size-1.5 rounded-full  ${res[0].Status == "Online" ? "bg-emerald-500" : ""}" />
+                <div id="i${res[0].ID}" class="size-1.5 rounded-full" />
                 </div>
-                <p class="text-xs/5 text-gray-500" id="${res[0].ID}">${res[0].Status}</p>
+                <!--<p class="text-xs/5 text-gray-500" id="${res[0].ID}">${res[0].Status}</p>-->
             </div>
         </div>
     </li></ul></a>`
+    if(document.getElementById("noFriends")) document.getElementById("noFriends").remove();
 }
 
 // <p class="text-sm/6 ">{{ person.role }}</p>
