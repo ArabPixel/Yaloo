@@ -1,15 +1,18 @@
 // @ts-ignore
 import { notification } from '/includes/functions/localNotification'
+import { notificationData } from '/includes/sharedContent'
 // @ts-ignore
 import { getUrlData } from '/includes/sharedContent'
 // Send notification when user is back online
 window.addEventListener("online", () => {
-    notification("You are back online!", "Wooohoo, you can chat with others again!", "connectionStatus")
+    var lang = document.documentElement.lang
+    notification(notificationData[lang].head, notificationData[lang].body, "connectionStatus")
 })
 
 // Send notification when user is gone offline
 window.addEventListener("offline", () => {
-    notification("You lost connection!", "Check your internet connection!", "connectionStatus")
+    var lang = document.documentElement.lang
+    notification(notificationData[lang].head, notificationData[lang].body, "connectionStatus")
 })
 
 // Resize webpage (For mobile)

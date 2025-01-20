@@ -1,5 +1,5 @@
 // @ts-ignore
-import { socket, usersDiv } from '/includes/sharedContent'
+import { socket, usersDiv, noFriendsMsg } from '/includes/sharedContent'
 // @ts-ignore
 import { displayFriend } from '/includes/functions/addFriend';
 let friends
@@ -9,14 +9,14 @@ socket.emit("give me contact list", localStorage.getItem("id"));
 socket.on("update contact list", (friendslist) => {
     friends = friendslist;
     usersDiv.innerHTML = "";
-    if (friends.length >= 0) {
+    if (friends.length > 0) {
         usersDiv.innerHTML = '';
         for (var i = 0; i < friends.length; i++) {
             let friendId = friends[i].from_id == localStorage.getItem("id") ? friends[i].to_id : friends[i].from_id;
             socket.emit("get user name", friendId);
         }
     } else {
-        usersDiv.innerHTML = "<center style='margin-top: 20px;color: black;' id='noFriends'>Go ahead and add some friends!</center>";
+        usersDiv.innerHTML = `<center style='margin-top: 20px;color: black;' id='noFriends'>${noFriendsMsg}</center>`
     }
 });
 

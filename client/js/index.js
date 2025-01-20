@@ -33,7 +33,14 @@ if (urlParams.get("id")) {
 
       if (receiverName && receiverStatus){
          receiverName.innerText = res2[0].Username;
-         receiverStatus.innerText = res2[0].Status;
+         switch(document.documentElement.lang){
+            case "ar":
+               if (res2[0].Status == "Online") receiverStatus.innerText = "متصل";
+               break;
+            case "en":
+               if (res2[0].Status == "Online") receiverStatus.innerText = "Online";
+               break;
+         }
       }
 
       res1.forEach(element => {
@@ -51,5 +58,4 @@ if (urlParams.get("id")) {
 }else{
    loadMessageBtn.remove()
    document.getElementById("chatLoading").remove();
-   document.getElementById("conversation").innerHTML = "<center style='margin-top: 20px;color: black;' id='noFriends'>Go ahead and add some friends!</center>";
 }
