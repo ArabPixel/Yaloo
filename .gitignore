@@ -1,0 +1,6 @@
+db/db.js
+node_modules
+.history
+.vscode
+Yaloo.code-workspace
+Text.txt

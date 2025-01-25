@@ -1,8 +1,8 @@
 var mysql = require('mysql');
 var conn = mysql.createConnection({
   host: 'localhost', // Replace with your host name
-  user: 'ArabPixel',      // Replace with your database username
-  password: 'yaman12othman',      // Replace with your database password
+  user: 'root',      // Replace with your database username
+  password: '',      // Replace with your database password
   database: 'my_chat_app', // // Replace with your database Name
   charset:  'utf8mb4'
 }); 
