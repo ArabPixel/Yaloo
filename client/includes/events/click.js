@@ -21,12 +21,6 @@ sendBtn.addEventListener("click", () => {
    }
 });
 
-document.addEventListener("click", (e) => {
-   if(e.target.classList.contains("user")){
-      location.href = "?id=" + e.target.id
-   }
-   console.log(e.target.parentNode)
-});
 
  addFriendBtn.addEventListener("click", () => {
     if (friendInput == null) return
