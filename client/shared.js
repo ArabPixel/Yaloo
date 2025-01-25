@@ -82,11 +82,10 @@ export function changeLangValues(html, confirmDeleteValue, deletedMessageValue, 
     deletedMessage = deletedMessageValue
     input.placeholder = inputPlaceholderValue
     friendModalHead.innerText = friendModalHeadValue
-    console.log(usersDiv.children[0])
-    usersDiv.children[0].innerText = noFriendsMsgValue
+    if(usersDiv.children.length == 0){
+        usersDiv.innerHTML = `<center style='margin-top: 20px;color: black;' id='noFriends'>${noFriendsMsgValue}</center>`
+    }
     friendRemoved = friendRemovedValue
     friendRemovedYou = friendRemovedYouValue
-    if(usersListStatus){
-        if (usersListStatus.innerText == "Online") usersListStatus.innerText = html == "en" ? "Online" : "متصل"
-    }
+    if (usersListStatus.innerText) usersListStatus.innerText = html == "en" ? "Online" : "متصل"
 }
