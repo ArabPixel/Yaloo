@@ -1,50 +1,74 @@
 # Yaloo
-Yaloo is a free and open source communication app aimed to provide **feature-rich** experience while having a **robust privacy**.
 
-***
+Yaloo is a **free and open-source** communication app designed to provide a **feature-rich** experience while prioritizing **privacy and security**.
 
-## Goal
+🛠️ **Licensed under MIT** – Feel free to use, modify, and contribute!
 
-My Goal is to make a safe and open source communication app that everybody can use, and having great customization to personalize your experiece!
+---
 
+## 🚀 Goal
 
-## Test locally or contribute
+The goal of Yaloo is to create a **secure and customizable** communication platform that is **accessible to everyone** while maintaining **full transparency and open-source ethics**.
 
-*Contributions are always welcome!*
+---
 
-### 1. Clone the repository
+## 🏠️ Tech Stack
+
+### **Client:**
+
+- HTML, CSS, JavaScript, TailwindCSS
+
+### **Server:**
+
+- Node.js, Express, MySQL, Socket.io
+
+---
+
+## 🛠️ Contribute to Yaloo
+
+💡 *Contributions are always welcome!* Whether you want to **fix bugs, add features, or improve performance**, every PR helps improve Yaloo.
+
+### 1️⃣ Clone the Repository
 
 ```bash
 git clone https://github.com/ArabPixel/Yaloo.git
 cd Yaloo
 ```
-### 2. Install the dependencies
+
+### 2️⃣ Install Dependencies
+
 ```bash
-npm Install
+npm install
 ```
-* Make changes if necessarily.
-### 3. Run the server using the Terminal
+
+### 3️⃣ Run the Server
+
 ```bash
 npm run dev
 ```
-### 4. Open a pull requrest
-###  Click ->[Here](https://github.com/ArabPixel/Yaloo/pulls)
 
-## Tech Stack
+### 4️⃣ Submit a Pull Request
 
-**Client:** 
-+ HTML, CSS, Javascript, TailwindCSS
+Once you've made your changes, open a pull request:\
+🔗 [**Click here to open a PR**](https://github.com/ArabPixel/Yaloo/pulls)
 
-**Server:** 
-+ Node, Express, MySQL, Socket.io
+---
 
+## 💡 Use Yaloo as Inspiration
 
-## Made with love by
+Yaloo is fully **open-source**, meaning you are **free to use, modify, and learn from** its code under the **MIT license**. If you create something inspired by Yaloo, a mention is required.
 
-- [@ArabPixel](https://www.github.com/ArabPixel)
+📚 **License:** [MIT License](./LICENSE)
 
+---
 
-## Support
+## ❤️ Created & Maintained by
 
-For support and more, join the community Discord server [Sourceware Lab](https://discord.gg/X69MUr2DKm).
+👨‍💻 [@ArabPixel](https://www.github.com/ArabPixel)
 
+---
+
+## 🌐 Support & Community
+
+For support, discussions, and updates, join our **Discord community**:\
+🔗 [**Sourceware Lab**](https://discord.gg/X69MUr2DKm)
