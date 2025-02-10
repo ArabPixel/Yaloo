@@ -59,3 +59,7 @@ if (urlParams.get("id")) {
    loadMessageBtn.remove()
    document.getElementById("chatLoading").remove();
 }
+
+document.getElementById('input').addEventListener('focus', function() {
+   document.body.style.zoom = '1';
+});

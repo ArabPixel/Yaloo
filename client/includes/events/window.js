@@ -17,28 +17,34 @@ window.addEventListener("offline", () => {
 
 // Resize webpage (For mobile)
 window.addEventListener('load', () => {
-    if (getUrlData("id") != null && getUrlData("id") > 0) {
-        var x = window.matchMedia("(max-width: 767px)");
-        let sideL = document.getElementById("sideL")
-        if (sideL == null) return
-        if (x.matches) {
-            sideL.style.display = "none";
+    let usersListDiv = document.getElementById("right")
+    let chatDiv = document.getElementById("chat")
+    var x = window.matchMedia("(max-width: 767px)")
+    if (usersListDiv == null || chatDiv == null) return
+    if (x.matches) {
+        if (getUrlData("id") != null && getUrlData("id") > 0) {
+            usersListDiv.style.display = "none";
         } else {
-            sideL.style.display = "block";
+            chatDiv.style.display = "none";
         }
+        
+    } else {
+        usersListDiv.style.display = "flex";
+        chatDiv.style.display = "flex"
     }
+
 })
 
 // Resize webpage (For pc)
 window.addEventListener('resize', () => {
     if (getUrlData("id") != null && getUrlData("id") > 0) {
         var x = window.matchMedia("(max-width: 767px)");
-        let sideL = document.getElementById("sideL")
-        if (sideL == null) return
+        let usersListDiv = document.getElementById("right")
+        if (usersListDiv == null) return
         if (x.matches) {
-            sideL.style.display = "none";
+            usersListDiv.style.display = "none";
         } else {
-            sideL.style.display = "block";
+            usersListDiv.style.display = "flex";
         }
     }
 })
