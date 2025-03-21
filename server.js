@@ -163,7 +163,7 @@ var usersList = new Map();
 // Import all users in a List to grab users faster
 conn.query(`SELECT * FROM users`, (err, res) => {
   res.forEach(user => {
-    usersList.set(user.ID.toString(), { username: user.Username, socketId: null, status: "Offline", friends: [], groups: [], lastSeen: user.LastSeen })
+    usersList.set(user.ID.toString(), { username: user.Username, socketId: null, status: 0, friends: [], groups: [], lastSeen: user.LastSeen })
   });
 })
 
@@ -179,8 +179,8 @@ setInterval(() => {
 io.on("connection", (socket) => {
   //set username and id 
   socket.on("update my socketID", (username, id) => {
-    updateUser(id, {socketId: socket.id, status: "Online" })
-    sendStatus(id, "Online")
+    updateUser(id, {socketId: socket.id, status: 1 })
+    sendStatus(id, 1)
     socket.emit("update client socketId", socket.id);
   })
 
@@ -257,7 +257,7 @@ io.on("connection", (socket) => {
             if (resId[0] == undefined || resId[0] == null) {
               socket.emit("here msgs from db", res, ress);
             } else {
-              socket.emit("here msgs from db", res, ress, resId[0]['ID']);
+              socket.emit("here msgs from db", res, ress, resId[0]['ID'], usersList.get(id).status);
             }
           })
         })
@@ -314,9 +314,9 @@ io.on("connection", (socket) => {
     let key = Array.from(usersList.keys()).find(k => usersList.get(k).socketId === socket.id);
     if (usersList.get(key) == undefined) return
     let user = usersList.get(key)
-    user.status = 'Offline'
+    user.status = 0
     usersList.set(key, user)
-    sendStatus(key, "Offline")
+    sendStatus(key, 0)
   })
 
   // Send typing indicator
@@ -347,13 +347,13 @@ io.on("connection", (socket) => {
 
   socket.on("deleteMsg", (msgId, receiver, sender) => {
     if (!usersList.has(receiver)) return
-    if (usersList.get(sender).status != "Online") return
+    if (usersList.get(sender).status != 1) return
     socket.emit("message deleted", msgId, usersList.get(sender).username)
     conn.query(`UPDATE messages SET deleted = 1 WHERE ID = ?`, [msgId], (err, res) => {
       if (err) throw err
       console.log(res)
     })
-    if (usersList.get(receiver).status != "Online") return
+    if (usersList.get(receiver).status != 1) return
     io.to(usersList.get(receiver).socketId).emit("message deleted", msgId, usersList.get(sender).username)
   })
 
@@ -379,7 +379,7 @@ function sendStatus(key, status) {
       // if nobody from friends is online, don't send
       if (usersList.get(id.toString()) == undefined) return
       let getUserUid = usersList.get(id.toString())
-      if (getUserUid.status == "Online") {
+      if (getUserUid.status == 1) {
         io.to(getUserUid.socketId).emit("changeUserStatus", status, key)
       }
     });
