@@ -12,6 +12,6 @@ socket.on("message receive", (msg, receiver, sender, username, date, msgsCountFr
     } else if (sender == localStorage.getItem("id")) {
         displayMessage("sent", msg, date, msgsCountFromDb, false)
     } else {
-        notification("New message from " + username, msg, sender)
+        notification("New message from " + username, msg, sender, "?id=" + sender)
     }
 });
