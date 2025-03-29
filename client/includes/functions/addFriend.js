@@ -11,7 +11,7 @@ export function addFriend(name) {
 }
 
 // display friend in html webpage
-export function displayFriend(res) {
+export function displayFriend(res, status) {
     usersDiv.innerHTML += `
     <a href="?id=${res[0].ID}"><ul id=""><li class="flex justify-between gap-x-6 py-5"
         >
@@ -26,9 +26,9 @@ export function displayFriend(res) {
         <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
 
             <div class="mt-1 flex items-center gap-x-1.5">
-                <div id="i${res[0].ID}" class="size-1.5 rounded-full" />
+                <div id="i${res[0].ID}" class="size-1.5 rounded-full ${status == 1 ? "bg-green-500" : ""}" />
                 </div>
-                <!--<p class="text-xs/5 text-gray-500" id="${res[0].ID}">${res[0].Status}</p>-->
+                <!--<p class="text-xs/5 text-gray-500" id="${res[0].ID}">${status}</p>-->
             </div>
         </div>
     </li></ul></a>`

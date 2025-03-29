@@ -222,7 +222,7 @@ io.on("connection", (socket) => {
 
   socket.on("get user name", (id) => {
     conn.query(`SELECT ID, Username FROM users WHERE ID = ?`, [id], (err, res) => {
-      socket.emit("here is user name", res, id);
+      socket.emit("here is user name", res, id, usersList.get(id.toString())?.status);
     });
   })
 
