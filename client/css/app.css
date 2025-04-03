@@ -12,7 +12,7 @@ body {
     color: var(--white);
     margin: 0;
     transition: 0.5s;
-    height: 100vh;
+    height: 100svh;
 }
 
 /* Page Layout */
@@ -20,7 +20,7 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100vh;
+    height: 100svh;
     margin: auto;
     padding: 12px;
 }
@@ -92,12 +92,16 @@ body {
     -moz-box-shadow: 1px -4px 5px -3px rgba(0, 0, 0, 0.75);
 }
 
-#settings svg {
+#settings i {
     width: 24px;
     height: 24px;
     color: rgb(255, 255, 255);
     cursor: pointer;
     transition: 0.3s;
+}
+
+i{
+    cursor: pointer;
 }
 
 /* Left Side */
@@ -199,7 +203,7 @@ body {
     #right,
     #chat {
         width: 100%;
-        height: 100vh;
+        height: 100svh;
     }
 }
 
@@ -243,7 +247,14 @@ body {
     resize: none;
 }
 
-svg[disabled]{
+i[disabled]{
     color: grey !important;
     cursor: not-allowed !important;
 }
+@media screen and (max-width: 380px) {
+    emoji-picker {
+      --num-columns: 4;
+      --category-emoji-size: 1.125rem;
+      width: 70%;
+    }
+  }

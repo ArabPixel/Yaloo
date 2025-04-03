@@ -54,7 +54,7 @@ if (urlParams.get("id")) {
          if (element.ID == resId) loadMessageBtn.remove()
       });
       chatContainer.scrollTop = chatContainer.scrollHeight
-      loadMessageBtn.remove()
+      // loadMessageBtn.remove()
       document.getElementById("chatLoading").remove();
    })
 }else{

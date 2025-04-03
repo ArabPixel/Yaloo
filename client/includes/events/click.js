@@ -1,5 +1,5 @@
 // @ts-ignore
-import { socket, sendBtn, input, getUrlData, friendInput, addFriendBtn, deleteFriendBtn, langBtn } from '/includes/sharedContent';
+import { socket, sendBtn, input, getUrlData, friendInput, addFriendBtn, deleteFriendBtn, langBtn, emojiPicker } from '/includes/sharedContent';
 // @ts-ignore
 import { addFriend } from '/includes/functions/addFriend';
 // @ts-ignore
@@ -45,4 +45,16 @@ document.body.addEventListener('click', (event) => {
        const messageId = buttonId.replace("delbtn", ""); // Extract the message ID
        DeleteMsg(messageId);
    }
+});
+
+emojiPicker.addEventListener('click', () => {
+   if(document.querySelector('emoji-picker').style.display === 'block'){
+      document.querySelector('emoji-picker').style.display = 'none'
+   }else{
+      document.querySelector('emoji-picker').style.display = 'block'
+   }
+})
+
+document.querySelector('emoji-picker').addEventListener('emoji-click', event =>{
+   document.getElementById('input').value += event.detail.unicode;
 });
