@@ -7,7 +7,7 @@ input.addEventListener("keyup", function (e) {
     // if enter clicked, don't send typing indicator
     if (e.key == "Enter") return
     // send typing indicator
-    socket.emit("typing", localStorage.getItem("id"), getUrlData("id"), "typing..")
+    socket.emit("typing", localStorage.getItem("id"), getUrlData("id"), 2)
     clearTimeout(timeout)
     setTypingTimeout(typingTimeOut, 2000)
 });

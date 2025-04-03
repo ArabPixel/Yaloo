@@ -2,8 +2,6 @@
 import { chatContainer, deletedMessage } from '/includes/sharedContent'
 // @ts-ignore
 import { scrollToBottom } from '/includes/functions/convoScroll';
-// @ts-ignore
-import { DeleteMsg } from '/includes/functions/deleteMsg';
 
 // Display message function when sending/receiving/ chat
 export function displayMessage(side, msg, date, countFromDb, deleted) {
@@ -13,28 +11,19 @@ export function displayMessage(side, msg, date, countFromDb, deleted) {
     newMessage.id = "msg" + countFromDb;
     newMessage.innerHTML = "<p></p>"
     newMessage.querySelector("p").textContent = msg;
-    if (side == "sender" && !deleted){
-        newMessage.innerHTML += `<button style="float: right;" type="button" id="delbtn${countFromDb}">Delete</button>`;
+    if (side == "sent" && !deleted){
+        newMessage.innerHTML += `<button style="float: right;" type="button" class="delBtns" id="delbtn${countFromDb}">Delete</button>`;
     }
     if (newMessage && !deleted) {
         newMessage.querySelector("p").textContent = msg
-        chatContainer.innerHTML += newMessage.outerHTML
     } else {
-        if (side == "sender") {
+        if (side == "sent") {
             newMessage.innerHTML = `<em>You ${deletedMessage}</em>`
         } else {
             newMessage.innerHTML = `<em>The sender ${deletedMessage}</em>`
         }
     }
-
-    // Add event listener to delete button if it exists
-    //if (side == "sender") {
-      //  const deleteButton = document.getElementById("delbtn" + countFromDb);
-        //if (deleteButton) {
-          //  deleteButton.addEventListener('click', () => DeleteMsg(countFromDb));
-        //}
-    //}
-
+    chatContainer.innerHTML += newMessage.outerHTML
     scrollToBottom()
 }
 

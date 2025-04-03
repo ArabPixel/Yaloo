@@ -21,7 +21,7 @@ import { displayMessage } from '../includes/functions/displayMsg'
 // load msgs when joining someone's chat
 if (urlParams.get("id")) {
    socket.emit("get msgs from db", getUrlData("id"), localStorage.getItem("id"), loadedMessagesCount);
-   socket.on("here msgs from db", (res1, res2, resId) => {
+   socket.on("here msgs from db", (res1, res2, resId, resStatus) => {
       let receiverName = document.getElementById("receiverName")
       let receiverStatus = document.getElementById("receiverStatus")
 
@@ -35,10 +35,12 @@ if (urlParams.get("id")) {
          receiverName.innerText = res2[0].Username;
          switch(document.documentElement.lang){
             case "ar":
-               if (res2[0].Status == "Online") receiverStatus.innerText = "متصل";
+               if (resStatus == 1) receiverStatus.innerText = "متصل";
+               if (resStatus == 2) receiverStatus.innerText = "يكتب..";
                break;
             case "en":
-               if (res2[0].Status == "Online") receiverStatus.innerText = "Online";
+               if (resStatus == 1) receiverStatus.innerText = "Online";
+               if (resStatus == 2) receiverStatus.innerText = "typing..";
                break;
          }
       }

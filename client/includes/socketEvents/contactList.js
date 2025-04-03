@@ -20,7 +20,7 @@ socket.on("update contact list", (friendslist) => {
     }
 });
 
-socket.on("here is user name", (res, id) => {
+socket.on("here is user name", (res, id, status) => {
     let friend = friends.find(friend => {
         let friendId = friend.from_id == localStorage.getItem("id") ? friend.to_id : friend.from_id;
         return friendId == id;
@@ -28,6 +28,6 @@ socket.on("here is user name", (res, id) => {
     if (friend) {
         let noFriends = document.getElementById('noFriends');
         if (noFriends) noFriends.innerText = ""; //<input type="checkbox" value="' + id + '">
-        displayFriend(res)
+        displayFriend(res, status)
     }
 });

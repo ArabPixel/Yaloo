@@ -8,10 +8,10 @@ import { notification } from '/includes/functions/localNotification'
 socket.on("message receive", (msg, receiver, sender, username, date, msgsCountFromDb) => {
 
     if (sender == getUrlData("id")) {
-        displayMessage("received", msg, date, msgsCountFromDb)
+        displayMessage("received", msg, date, msgsCountFromDb, false)
     } else if (sender == localStorage.getItem("id")) {
-        displayMessage("sent", msg, date, msgsCountFromDb)
+        displayMessage("sent", msg, date, msgsCountFromDb, false)
     } else {
-        notification("New message from " + username, msg, sender)
+        notification("New message from " + username, msg, sender, "?id=" + sender)
     }
 });

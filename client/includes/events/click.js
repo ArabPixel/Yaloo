@@ -7,6 +7,7 @@ import { typingTimeOut } from '/includes/functions/typingIndicator'
 import { switchLang } from '/includes/functions/changeLang';
 // @ts-ignore
 import { removeFriend } from '/includes/functions/removeFriend'
+import { DeleteMsg } from '/includes/functions/deleteMsg'
 
 //send message code
 sendBtn.addEventListener("click", () => {
@@ -37,3 +38,11 @@ deleteFriendBtn?.addEventListener('click', () => {
 langBtn?.addEventListener('click', (e) => {
    switchLang()
 })
+
+document.body.addEventListener('click', (event) => {
+   if (event.target.classList.contains('delBtns')) {
+       const buttonId = event.target.id; // Get the ID of the clicked button
+       const messageId = buttonId.replace("delbtn", ""); // Extract the message ID
+       DeleteMsg(messageId);
+   }
+});

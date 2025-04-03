@@ -1,3 +1,4 @@
+### It's under development
 # Yaloo
 
 Yaloo is a **free and open-source** communication app designed to provide a **feature-rich** experience while prioritizing **privacy and security**.
