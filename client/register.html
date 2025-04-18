@@ -20,6 +20,7 @@
         <center>
             <h2>Create Account</h2>
             <input type="text" id="user" placeholder="Enter your username" class="form-control w-50" required>
+            <input type="email" id="email" placeholder="Enter your E-Mail" class="form-control w-50 mt-2" required>
             <input type="password" id="pass" placeholder="Enter your password" class="form-control mt-2 w-50" required>
             <button id="register" class="btn btn-danger mt-3" type="submit">Create account</button>
             <a href="/login" class="btn btn-primary mt-3">Login</a>
@@ -41,9 +42,10 @@
         login.addEventListener("click", (e) => {
             e.preventDefault();
             var user = username.value;
+            var mail = email.value;
             var pass = password.value;
-            if (user === '' || pass === '') return;
-            socket.emit("check register", user, pass);
+            if (user === '' || mail === ''|| pass === '') return;
+            socket.emit("check register", user, mail, pass);
         });
 
         socket.on("Register result", () => {

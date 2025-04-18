@@ -196,12 +196,12 @@ io.on("connection", (socket) => {
   });
 
   //register
-  socket.on("check register", (user, pass) => {
-    if (user && pass) {
+  socket.on("check register", (user, email, pass) => {
+    if (user && email && pass) {
       conn.query(`SELECT * FROM users WHERE Username = ?`, [user], (err, res) => {
         if (res.length == 0) {
-          conn.query(`INSERT INTO users(Username, Password, Activation)VALUES(?, ?, ?)`,
-            [user, pass, '1'], (err, res) => {
+          conn.query(`INSERT INTO users(Username, Email, Password, Image, Security_Code, Activation)VALUES(?, ?, ?, ?, ?, ?)`,
+            [user, email, pass, '0', '0', '1'], (err, res) => {
             if (err) throw err
             socket.emit("Register result")
           })
