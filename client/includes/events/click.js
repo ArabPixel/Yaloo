@@ -47,8 +47,11 @@ document.body.addEventListener('click', (event) => {
    }
 });
 
-emojiPicker.addEventListener('click', () => {
+emojiPicker.addEventListener('click', (e) => {
    if(document.querySelector('emoji-picker').style.display === 'block'){
+      // Check if the clicked element is not the emoji picker itself
+      // and hide the emoji picker if it is not
+      if(e.target.classList.contains('ePickerClass')) return
       document.querySelector('emoji-picker').style.display = 'none'
    }else{
       document.querySelector('emoji-picker').style.display = 'block'
