@@ -279,7 +279,7 @@ io.on("connection", (socket) => {
       conn.query(`SELECT from_id, to_id FROM friends WHERE from_id = ? AND to_id = ? OR from_id = ? AND to_id = ?`, [res[0].ID, from_id, from_id, res[0].ID], (errorno, resulty) => {
         if (errorno) throw errorno
         if (resulty.length == 0) {
-          conn.query(`INSERT INTO friends(from_id, to_id)VALUES(?, ?)`, [from_id, res[0].ID], (err, ress) => {
+          conn.query(`INSERT INTO friends(from_id, to_id, status)VALUES(?, ?, ?)`, [from_id, res[0].ID, 0], (err, ress) => {
             socket.emit("friend added successfully", res);
           })
           if (usersList.has(res[0].ID.toString())) {
