@@ -18,6 +18,7 @@ let confirmDelete = "Are you sure you want to delete this message?"  //    Delet
 let deletedMessage = "deleted this Message"                          //    Text shown when a message deleted (Format: username + var deletedMessage)
 var friendRemoved = "Your Friend has been removed Successfully"      //    Text shown when a friend removed (Format: username + var friendRemoved)
 var friendRemovedYou = "deleted this friend Successfully"            //    Text shown when you deleted a friend (Format: username + var friendRemovedYou)
+var emojiPicker = document.getElementById('emojiPicker')             //    Emoji Picker Div
 var notificationData = {                                             //    Notification data         
     ar: {
         head: "تم الإتصال بالخادم",                                 
@@ -55,7 +56,8 @@ export {
     langBtn,
     noFriendsMsg,
     friendRemoved,
-    friendRemovedYou
+    friendRemovedYou,
+    emojiPicker
 }
 export function updateFirstMsgIdVar(id){
     firstMsgIdOfConversation = id

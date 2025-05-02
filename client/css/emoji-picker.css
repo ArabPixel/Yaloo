@@ -1,0 +1,36 @@
+/* Emoji picker container */
+#emojiPicker {
+  position: relative;
+  display: inline-block;
+}
+
+/* Emoji picker element */
+.ePickerClass {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  max-width: 320px;
+  width: 100%;
+  height: 280px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  background: white;
+  display: none;
+  overflow: auto;
+}
+
+/* Show emoji picker */
+.ePickerClass.show {
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .ePickerClass {
+    bottom: 50px;
+    max-width: 90vw;
+    height: 250px;
+  }
+}

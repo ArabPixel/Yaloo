@@ -47,4 +47,52 @@ window.addEventListener('resize', () => {
             usersListDiv.style.display = "flex";
         }
     }
+    
 })
+
+window.visualViewport.addEventListener('resize', handleKeyboardState);
+// Add this to your window.js file
+// Update window.js
+let lastViewportHeight = window.visualViewport.height;
+let isKeyboardOpen = false;
+
+function handleKeyboardState() {
+    const currentHeight = window.visualViewport.height;
+    
+    // Detect keyboard state change
+    if (currentHeight < lastViewportHeight - 50 && !isKeyboardOpen) {
+        // Keyboard opened
+        isKeyboardOpen = true;
+        adjustContentForKeyboard(true);
+    } else if (currentHeight >= lastViewportHeight - 50 && isKeyboardOpen) {
+        // Keyboard closed
+        isKeyboardOpen = false;
+        adjustContentForKeyboard(false);
+    }
+    
+    lastViewportHeight = currentHeight;
+}
+
+function adjustContentForKeyboard(isKeyboardOpen) {
+    const chatContainer = document.getElementById('chat');
+    const inputContainer = document.getElementById('bottom');
+    
+    if (chatContainer && inputContainer) {
+        if (isKeyboardOpen) {
+            // Adjust for keyboard
+            chatContainer.style.height = 'calc(100svh - 200px)'; // Adjust this value based on your keyboard height
+            chatContainer.style.overflow = 'hidden';
+            inputContainer.style.position = 'fixed';
+            inputContainer.style.bottom = '0';
+            inputContainer.style.width = '100%';
+            inputContainer.style.zIndex = '1000';
+        } else {
+            // Reset to normal
+            chatContainer.style.height = '100svh';
+            chatContainer.style.overflow = 'auto';
+            inputContainer.style.position = 'relative';
+            inputContainer.style.bottom = '';
+            inputContainer.style.zIndex = '';
+        }
+    }
+}
