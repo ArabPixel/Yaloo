@@ -28,7 +28,7 @@ if (urlParams.get("id")) {
       if (resId != undefined){
          updateFirstMsgIdVar(resId)
       }else{
-         loadMessageBtn.remove();
+         //loadMessageBtn.remove();
       }
 
       if (receiverName && receiverStatus){
@@ -51,17 +51,13 @@ if (urlParams.get("id")) {
          } else {
             displayMessage("received", element.msg, element.date, element.ID, element.deleted)
          }
-         if (element.ID == resId) loadMessageBtn.remove()
+         //if (element.ID == resId) loadMessageBtn.remove()
       });
       chatContainer.scrollTop = chatContainer.scrollHeight
       // loadMessageBtn.remove()
-      document.getElementById("chatLoading").remove();
    })
-}else{
-   loadMessageBtn.remove()
-   document.getElementById("chatLoading").remove();
 }
-
+document.getElementById("chatLoading").remove();
 document.getElementById('input').addEventListener('focus', function() {
    document.body.style.zoom = '1';
 });

@@ -11,7 +11,7 @@ socket.on("load more messages now", (res, friendUsername) => {
             displayLoadedMessages(element.ID, "received", element.date, element.msg, element.deleted)
         }
         if (element.ID == firstMsgIdOfConversation) {
-            loadMessageBtn.remove();
+            //loadMessageBtn.remove();
         }
     });
 })

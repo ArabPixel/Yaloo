@@ -80,15 +80,26 @@ function adjustContentForKeyboard(isKeyboardOpen) {
     if (chatContainer && inputContainer) {
         if (isKeyboardOpen) {
             // Adjust for keyboard
-            chatContainer.style.height = 'calc(100svh - 200px)'; // Adjust this value based on your keyboard height
-            chatContainer.style.overflow = 'hidden';
+            const keyboardHeight = lastViewportHeight - window.visualViewport.height;
+            chatContainer.style.height = `calc(100svh - ${keyboardHeight}px - ${inputContainer.offsetHeight}px)`;
+            chatContainer.style.overflow = 'auto';
             inputContainer.style.position = 'fixed';
-            inputContainer.style.bottom = '0';
+            inputContainer.style.bottom = `${keyboardHeight}px`;
             inputContainer.style.width = '100%';
             inputContainer.style.zIndex = '1000';
+
+            // Scroll to the bottom of the chat container with a small delay to ensure rendering
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                // Fallback: scroll last child into view if any
+                const lastChild = chatContainer.lastElementChild;
+                if (lastChild) {
+                    lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 50);
         } else {
             // Reset to normal
-            chatContainer.style.height = '100svh';
+            chatContainer.style.height = `100svh`;
             chatContainer.style.overflow = 'auto';
             inputContainer.style.position = 'relative';
             inputContainer.style.bottom = '';
